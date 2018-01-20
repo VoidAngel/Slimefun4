@@ -41,6 +41,7 @@ public class Slimefun {
      * Lists all the registered categories.
      */
 	public static List<Category> current_categories = new ArrayList<Category>();
+	public static boolean askyblock = false;
 
 	public static void registerGuideHandler(GuideHandler handler) {
 		List<GuideHandler> handlers = new ArrayList<GuideHandler>();

@@ -4,10 +4,15 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.Dispenser;
+import org.bukkit.block.Furnace;
+import org.bukkit.block.Hopper;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -45,13 +50,21 @@ public class ToolListener implements Listener {
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled = true)
 	public void onBlockRegister(BlockPlaceEvent e) {
-		if (BlockStorage.hasBlockInfo(e.getBlock())) {
+		if (!e.isCancelled() && BlockStorage.hasBlockInfo(e.getBlock())) {
 			e.setCancelled(true);
+			System.out.println(BlockStorage.checkID(e.getBlock()) + " block cleared at " + e.getBlock().getLocation().toString());
+			BlockStorage.clearBlockInfo(e.getBlock());
 			return;
 		}
 		ItemStack item = e.getItemInHand();
 		if (item != null && item.getType() == Material.INK_SACK) return;
 		SlimefunItem sfItem = SlimefunItem.getByItem(item);
+		if (item.getType() == Material.COAL_BLOCK && item.hasItemMeta()
+				&& item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().equals(ChatColor.translateAlternateColorCodes('&', "&rCharcoal Block"))) 
+		{
+			e.setCancelled(true);
+			return;
+		}
 		if (sfItem != null && !(sfItem instanceof NotPlaceable)){
 			BlockStorage.addBlockInfo(e.getBlock(), "id", sfItem.getID(), true);
 			if (SlimefunItem.blockhandler.containsKey(sfItem.getID())) {
@@ -67,6 +80,11 @@ public class ToolListener implements Listener {
 	
 	@EventHandler
 	public void onBlockPlace(BlockPlaceEvent e) {
+		if (!e.isCancelled() && BlockStorage.hasBlockInfo(e.getBlock())) {
+			System.out.println(BlockStorage.checkID(e.getBlock()) + " block cleared at " + e.getBlock().getLocation().toString());
+			BlockStorage.clearBlockInfo(e.getBlock());
+			return;
+		}
 		ItemStack item = e.getItemInHand();
 		
 		if (Variables.cancelPlace.contains(e.getPlayer().getUniqueId())) {
@@ -214,6 +232,59 @@ public class ToolListener implements Listener {
 				if (((BlockBreakHandler) handler).onBlockBreak(e, item, fortune, drops)) break;
 			}
 		}
+		else if (sfItem == null)
+		{
+			if(e.getBlock().getType() == Material.FURNACE || e.getBlock().getType() == Material.BURNING_FURNACE)
+			{
+				Furnace broken = (Furnace) e.getBlock().getState();
+				String msg = null;
+
+				switch(broken.getInventory().getTitle())
+				{
+				case "§cElectric Furnace": drops.add(SlimefunItems.ELECTRIC_FURNACE); msg = "SF Fix > Broken " + broken.getInventory().getTitle() + " block recovered for " + e.getPlayer().getName(); break;
+				case "§cElectric Furnace §7- §eII": drops.add(SlimefunItems.ELECTRIC_FURNACE_2); msg = "SF Fix > Broken " + broken.getInventory().getTitle() + " block recovered for " + e.getPlayer().getName(); break;
+				case "§cElectric Furnace §7- §eIII": drops.add(SlimefunItems.ELECTRIC_FURNACE_3); msg = "SF Fix > Broken " + broken.getInventory().getTitle() + " block recovered for " + e.getPlayer().getName(); break;
+				case "§cElectric Ore Grinder": drops.add(SlimefunItems.ELECTRIC_ORE_GRINDER); msg = "SF Fix > Broken " + broken.getInventory().getTitle() + " block recovered for " + e.getPlayer().getName(); break;
+				case "§cElectric Ore Grinder §7(§eII§7)": drops.add(SlimefunItems.ELECTRIC_ORE_GRINDER_2); msg = "SF Fix > Broken " + broken.getInventory().getTitle() + " block recovered for " + e.getPlayer().getName(); break;
+				case "§cElectric Ingot Pulverizer": drops.add(SlimefunItems.ELECTRIC_INGOT_PULVERIZER); msg = "SF Fix > Broken " + broken.getInventory().getTitle() + " block recovered for " + e.getPlayer().getName(); break;
+				case "§cElectric Smeltery": drops.add(SlimefunItems.ELECTRIC_SMELTERY); msg = "SF Fix > Broken " + broken.getInventory().getTitle() + " block recovered for " + e.getPlayer().getName(); break;
+				case "§cElectric Smeltery §7- §eII": drops.add(SlimefunItems.ELECTRIC_SMELTERY_2); msg = "SF Fix > Broken " + broken.getInventory().getTitle() + " block recovered for " + e.getPlayer().getName(); break;
+				}
+				
+				if (msg != null)
+				{
+					System.out.println(msg);
+				}
+			}
+			else if(e.getBlock().getType() == Material.DISPENSER)
+			{
+				Dispenser broken = (Dispenser) e.getBlock().getState();
+				String msg = null;
+
+				switch(broken.getInventory().getTitle())
+				{
+				case "§7Android Interface §c(Fuel)": drops.add(SlimefunItems.ANDROID_INTERFACE_FUEL); msg = "SF Fix > Broken " + broken.getInventory().getTitle() + " block recovered for " + e.getPlayer().getName(); break;
+				case "§7Android Interface §9(Items)": drops.add(SlimefunItems.ANDROID_INTERFACE_ITEMS); msg = "SF Fix > Broken " + broken.getInventory().getTitle() + " block recovered for " + e.getPlayer().getName(); break;
+				case "§dAncient Pedestal": drops.add(SlimefunItems.ANCIENT_PEDESTAL); msg = "SF Fix > Broken " + broken.getInventory().getTitle() + " block recovered for " + e.getPlayer().getName(); break;
+				}
+				
+				if (msg != null)
+					System.out.println(msg);
+			}
+			else if(e.getBlock().getType() == Material.HOPPER)
+			{
+				Hopper broken = (Hopper) e.getBlock().getState();
+				String msg = null;
+
+				switch(broken.getInventory().getTitle())
+				{
+				case "§5Infused Hopper": drops.add(SlimefunItems.ANCIENT_ALTAR); msg = "SF Fix > Broken " + broken.getInventory().getTitle() + " block recovered for " + e.getPlayer().getName(); break;
+				}
+				
+				if (msg != null)
+					System.out.println(msg);
+			}
+		}
 		
 		if (!drops.isEmpty()) {
 			e.getBlock().setType(Material.AIR);
@@ -233,7 +304,7 @@ public class ToolListener implements Listener {
 			SlimefunItem item = BlockStorage.check(block);
     		if (item != null) {
     			blocks.remove();
-    			if (!item.getID().equalsIgnoreCase("HARDENED_GLASS") && !item.getID().equalsIgnoreCase("WITHER_PROOF_OBSIDIAN") && !item.getID().equalsIgnoreCase("WITHER_PROOF_GLASS") && !item.getID().equalsIgnoreCase("FORCEFIELD_PROJECTOR") && !item.getID().equalsIgnoreCase("FORCEFIELD_RELAY")) {
+    			if (!(e.getEntity().getType() == EntityType.CREEPER) && !item.getID().equalsIgnoreCase("HARDENED_GLASS") && !item.getID().equalsIgnoreCase("WITHER_PROOF_OBSIDIAN") && !item.getID().equalsIgnoreCase("WITHER_PROOF_GLASS") && !item.getID().equalsIgnoreCase("FORCEFIELD_PROJECTOR") && !item.getID().equalsIgnoreCase("FORCEFIELD_RELAY")) {
     				boolean success = true;
     				if (SlimefunItem.blockhandler.containsKey(item.getID())) {
     					success = SlimefunItem.blockhandler.get(item.getID()).onBreak(null, block, item, UnregisterReason.EXPLODE);
@@ -245,7 +316,6 @@ public class ToolListener implements Listener {
     			}
     		}
 		}
-	    
 	}
 	
 	@EventHandler

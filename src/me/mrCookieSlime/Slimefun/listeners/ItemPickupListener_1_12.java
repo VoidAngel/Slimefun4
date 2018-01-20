@@ -5,6 +5,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 
 /**
  * Listens to the ItemPickup events to prevent it if the item has the "no_pickup" metadata or is an ALTAR_PROBE.
@@ -20,7 +21,7 @@ public class ItemPickupListener_1_12 implements Listener {
     }
 
     @EventHandler
-    public void onPickup(EntityPickupItemEvent e) {
+    public void onPickup(PlayerPickupItemEvent e) {
         if (e.getItem().hasMetadata("no_pickup")) e.setCancelled(true);
         else if (!e.getItem().hasMetadata("no_pickup") && e.getItem().getItemStack().hasItemMeta() && e.getItem().getItemStack().getItemMeta().hasDisplayName() && e.getItem().getItemStack().getItemMeta().getDisplayName().startsWith("&5&dALTAR &3Probe - &e")) {
             e.setCancelled(true);

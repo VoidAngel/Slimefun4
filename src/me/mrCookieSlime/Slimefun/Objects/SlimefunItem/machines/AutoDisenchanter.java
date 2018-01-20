@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
@@ -28,6 +29,7 @@ import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecip
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.mrCookieSlime.Slimefun.api.Slimefun;
 import me.mrCookieSlime.Slimefun.api.energy.ChargableBlock;
+import net.voidrealms.tinkertools.Objects.TinkerTool;
 
 public class AutoDisenchanter extends AContainer {
 
@@ -102,36 +104,39 @@ public class AutoDisenchanter extends AContainer {
 				
 				// Disenchant
 				if (item != null && target != null && target.getType() == Material.BOOK) {
-					int amount = 0;
-
-					for (Map.Entry<Enchantment, Integer> e: item.getEnchantments().entrySet()) {
-						enchantments.put(e.getKey(), e.getValue());
-						amount++;
-					}
-					if (Slimefun.isEmeraldEnchantsInstalled()) {
-						for (ItemEnchantment enchantment: EmeraldEnchants.getInstance().getRegistry().getEnchantments(item)) {
+					if (!Bukkit.getPluginManager().isPluginEnabled("TinkerTools") || !TinkerTool.isTinkerTool(item))
+					{
+						int amount = 0;
+	
+						for (Map.Entry<Enchantment, Integer> e: item.getEnchantments().entrySet()) {
+							enchantments.put(e.getKey(), e.getValue());
 							amount++;
-							enchantments2.add(enchantment);
 						}
-					}
-					if (amount > 0) {
-						ItemStack newItem = item.clone();
-						ItemStack book = target.clone();
-						book.setAmount(1);
-						book.setType(Material.ENCHANTED_BOOK);
-						EnchantmentStorageMeta meta = (EnchantmentStorageMeta) book.getItemMeta();
-						for (Map.Entry<Enchantment,Integer> e: enchantments.entrySet()) {
-							newItem.removeEnchantment(e.getKey());
-							meta.addStoredEnchant(e.getKey(), e.getValue(), true);
+						if (Slimefun.isEmeraldEnchantsInstalled()) {
+							for (ItemEnchantment enchantment: EmeraldEnchants.getInstance().getRegistry().getEnchantments(item)) {
+								amount++;
+								enchantments2.add(enchantment);
+							}
 						}
-						book.setItemMeta(meta);
-
-						for (ItemEnchantment e: enchantments2) {
-							EmeraldEnchants.getInstance().getRegistry().applyEnchantment(book, e.getEnchantment(), e.getLevel());
-							EmeraldEnchants.getInstance().getRegistry().applyEnchantment(newItem, e.getEnchantment(), 0);
+						if (amount > 0) {
+							ItemStack newItem = item.clone();
+							ItemStack book = target.clone();
+							book.setAmount(1);
+							book.setType(Material.ENCHANTED_BOOK);
+							EnchantmentStorageMeta meta = (EnchantmentStorageMeta) book.getItemMeta();
+							for (Map.Entry<Enchantment,Integer> e: enchantments.entrySet()) {
+								newItem.removeEnchantment(e.getKey());
+								meta.addStoredEnchant(e.getKey(), e.getValue(), true);
+							}
+							book.setItemMeta(meta);
+	
+							for (ItemEnchantment e: enchantments2) {
+								EmeraldEnchants.getInstance().getRegistry().applyEnchantment(book, e.getEnchantment(), e.getLevel());
+								EmeraldEnchants.getInstance().getRegistry().applyEnchantment(newItem, e.getEnchantment(), 0);
+							}
+							r = new MachineRecipe(100 * amount, new ItemStack[] {target, item}, new ItemStack[] {newItem, book});
+							break slots;
 						}
-						r = new MachineRecipe(100 * amount, new ItemStack[] {target, item}, new ItemStack[] {newItem, book});
-						break slots;
 					}
 				}
 			}

@@ -321,6 +321,7 @@ public class SlimefunItems {
 	public static ItemStack ZINC_DUST = new CustomItem(Material.SUGAR, "&6Zinc Dust", 0);
 	public static ItemStack MAGNESIUM_DUST = new CustomItem(Material.SUGAR, "&6Magnesium", 0);
 	public static ItemStack CARBON = null;
+	public static ItemStack CHARCOAL_BLOCK = new CustomItem(Material.COAL_BLOCK, "&rCharcoal Block", 0);
 	public static ItemStack SILICON = new CustomItem(Material.FIREWORK_CHARGE, "&6Silicon", 0);
 	public static ItemStack GOLD_24K_BLOCK = new CustomItem(Material.GOLD_BLOCK, "&rGold Block &7(24-Carat)", 0);
 	
@@ -366,6 +367,8 @@ public class SlimefunItems {
 	public static ItemStack COMPRESSOR = new CustomItem(Material.PISTON_BASE, "&bCompressor", 0, new String[] {"", "&a&oCompresses Items"});
 	public static ItemStack PRESSURE_CHAMBER = new CustomItem(Material.GLASS, "&bPressure Chamber", 0, new String[] {"", "&a&oCompresses Items even more"});
 	public static ItemStack MAGIC_WORKBENCH = new CustomItem(Material.WORKBENCH, "&6Magic Workbench", 0, new String[] {"Infuses Items with magical Energy"});
+	public static ItemStack AUTOMATED_MAGIC_WORKBENCH = new CustomItem(new MaterialData(Material.BOOKSHELF), "&dAutomated Magic Workbench", "", "&6Advanced Machine", "&8\u21E8 &e\u26A1 &710 J/Item");
+	public static ItemStack AUTOMATED_VANILLA_CRAFTER = new CustomItem(new MaterialData(Material.WORKBENCH), "&6Automated Vanilla Crafter", "", "&6Advanced Machine", "Crafts shaped recipes only!","&8\u21E8 &e\u26A1 &710 J/Item");
 	public static ItemStack ORE_WASHER = new CustomItem(Material.CAULDRON_ITEM, "&6Ore Washer", 0, new String[] {"", "&a&oWashes Sifted Ore to filter Ores", "&a&oand gives you small Stone Chunks"});
 	public static ItemStack SAW_MILL = new CustomItem(Material.IRON_FENCE, "&6Saw Mill", 0, new String[] {"", "&a&oAllows you to get 8 planks from 1 Log"});
 	public static ItemStack COMPOSTER = new CustomItem(Material.CAULDRON_ITEM, "&aComposter", 0, new String[] {"", "&a&oCan convert various Materials over Time..."});
@@ -508,6 +511,7 @@ public class SlimefunItems {
 	public static ItemStack PROGRAMMABLE_ANDROID_2_FISHERMAN = null;
 	public static ItemStack PROGRAMMABLE_ANDROID_2_FARMER = null;
 	public static ItemStack PROGRAMMABLE_ANDROID_2_BUTCHER = null;
+	public static ItemStack PROGRAMMABLE_ANDROID_2_MINER = null;
 
 	public static ItemStack PROGRAMMABLE_ANDROID_3 = null;
 	public static ItemStack PROGRAMMABLE_ANDROID_3_FISHERMAN = null;
@@ -550,6 +554,10 @@ public class SlimefunItems {
 	
 	public static ItemStack ELECTRIC_SMELTERY = new CustomItem(new MaterialData(Material.FURNACE), "&cElectric Smeltery", "", "&4Alloys-Only, doesn't smelt Dust into Ingots", "", "&4End-Game Machine", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &720 J/s");
 	public static ItemStack ELECTRIC_SMELTERY_2 = new CustomItem(new MaterialData(Material.FURNACE), "&cElectric Smeltery &7- &eII", "", "&4Alloys-Only, doesn't smelt Dust into Ingots", "", "&4End-Game Machine", "&8\u21E8 &7Speed: 3x", "&8\u21E8 &e\u26A1 &740 J/s");
+	
+	public static ItemStack ELECTRIFIED_COMPOSTER = new CustomItem(new MaterialData(Material.STAINED_CLAY, (byte) 10), "&aElectrified Composter", "", "&4End-Game Machine", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &748 J/s");
+	public static ItemStack ELECTRIFIED_COMPOSTER_2 = new CustomItem(new MaterialData(Material.STAINED_CLAY, (byte) 10), "&aElectrified Composter &7- &eII", "", "&4End-Game Machine", "&8\u21E8 &7Speed: 2x", "&8\u21E8 &e\u26A1 &780 J/s");
+	public static ItemStack ELECTRIFIED_COMPOSTER_3 = new CustomItem(new MaterialData(Material.STAINED_CLAY, (byte) 10), "&aElectrified Composter &7- &eIII", "", "&4End-Game Machine", "&8\u21E8 &7Speed: 4x", "&8\u21E8 &e\u26A1 &7120 J/s");
 	
 	public static ItemStack ELECTRIFIED_CRUCIBLE = new CustomItem(new MaterialData(Material.STAINED_CLAY, (byte) 14), "&cElectrified Crucible", "", "&4End-Game Machine", "&8\u21E8 &7Speed: 1x", "&8\u21E8 &e\u26A1 &748 J/s");
 	public static ItemStack ELECTRIFIED_CRUCIBLE_2 = new CustomItem(new MaterialData(Material.STAINED_CLAY, (byte) 14), "&cElectrified Crucible &7- &eII", "", "&4End-Game Machine", "&8\u21E8 &7Speed: 2x", "&8\u21E8 &e\u26A1 &780 J/s");
@@ -714,7 +722,8 @@ public class SlimefunItems {
 			PROGRAMMABLE_ANDROID_2_FISHERMAN = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzQ1ZTg3MzNhNzMxMTQzMzNiOThiMzYwMTc1MTI0MTcyMmY0NzEzZTFhMWE1ZDM2ZmJiMTMyNDkzZjFjNyJ9fX0="), "&cAdvanced Programmable Android &7(Fisherman)", "", "&8\u21E8 &7Function: Fishing", "&8\u21E8 &7Success Rate: 20%", "&8\u21E8 &7Fuel Efficiency: 1.5x");
 			PROGRAMMABLE_ANDROID_2_FARMER = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjlkMzMzNTdlODQxODgyM2JmNzgzZGU5MmRlODAyOTFiNGViZDM5MmFlYzg3MDY2OThlMDY4OTZkNDk4ZjYifX19"), "&cAdvanced Programmable Android &7(Farmer)", "", "&8\u21E8 &7Function: Farming", "&8\u21E8 &7Fuel Efficiency: 1.5x", "&8\u21E8 &7Can also harvest Plants from ExoticGarden");
 			PROGRAMMABLE_ANDROID_2_BUTCHER = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2I0NzJkZjBhZDlhM2JlODhmMmU1ZDVkNDIyZDAyYjExNmQ2NGQ4ZGYxNDc1ZWQzMmU1NDZhZmM4NGIzMSJ9fX0="), "&cAdvanced Programmable Android &7(Butcher)", "", "&8\u21E8 &7Function: Slaughtering", "&8\u21E8 &7Damage: 8", "&8\u21E8 &7Fuel Efficiency: 1.5x");
-
+			PROGRAMMABLE_ANDROID_2_MINER = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTYzOGEyODU0MWFiM2FlMGE3MjNkNTU3ODczOGUwODc1ODM4OGVjNGMzMzI0N2JkNGNhMTM0ODJhZWYzMzQifX19"), "&cAdvanced Programmable Android &7(Miner)", "", "&8\u21E8 &7Function: Mining", "&8\u21E8 &7Fuel Efficiency: 1.5x", "&8\u21E8 &72x ore and cobble drop rates");
+			
 			PROGRAMMABLE_ANDROID_3 = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzUwM2NiN2VkODQ1ZTdhNTA3ZjU2OWFmYzY0N2M0N2FjNDgzNzcxNDY1YzlhNjc5YTU0NTk0Yzc2YWZiYSJ9fX0="), "&eEmpowered Programmable Android &7(Normal)", "", "&8\u21E8 &7Function: None", "&8\u21E8 &7Fuel Efficiency: 3.0x");
 			PROGRAMMABLE_ANDROID_3_FISHERMAN = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMzQ1ZTg3MzNhNzMxMTQzMzNiOThiMzYwMTc1MTI0MTcyMmY0NzEzZTFhMWE1ZDM2ZmJiMTMyNDkzZjFjNyJ9fX0="), "&eEmpowered Programmable Android &7(Fisherman)", "", "&8\u21E8 &7Function: Fishing", "&8\u21E8 &7Success Rate: 30%", "&8\u21E8 &7Fuel Efficiency: 8.0x");
 			PROGRAMMABLE_ANDROID_3_BUTCHER = new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvM2I0NzJkZjBhZDlhM2JlODhmMmU1ZDVkNDIyZDAyYjExNmQ2NGQ4ZGYxNDc1ZWQzMmU1NDZhZmM4NGIzMSJ9fX0="), "&eEmpowered Programmable Android &7(Butcher)", "", "&8\u21E8 &7Function: Slaughtering", "&8\u21E8 &7Damage: 20", "&8\u21E8 &7Fuel Efficiency: 8.0x");

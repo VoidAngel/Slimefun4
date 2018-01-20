@@ -1,11 +1,13 @@
 package me.mrCookieSlime.Slimefun.Commands;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
@@ -16,6 +18,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.Plugin;
 
 import me.mrCookieSlime.CSCoreLibPlugin.CSCoreLib;
@@ -24,6 +29,7 @@ import me.mrCookieSlime.CSCoreLibPlugin.general.Chat.CommandHelp;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.Item.CustomItem;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Player.Players;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Reflection.ReflectionUtils;
+import me.mrCookieSlime.CSCoreLibPlugin.general.World.CustomSkull;
 import me.mrCookieSlime.CSCoreLibPlugin.general.World.TitleBuilder;
 import me.mrCookieSlime.CSCoreLibPlugin.general.World.TitleBuilder.TitleType;
 import me.mrCookieSlime.Slimefun.SlimefunGuide;
@@ -98,7 +104,49 @@ public class SlimefunCommand implements CommandExecutor, Listener {
 			sendHelp(sender);
 		}
 		else if (args.length > 0) {
-			if (args[0].equalsIgnoreCase("cheat")) {
+			if (args[0].equalsIgnoreCase("fix")) {
+				if (sender instanceof Player) {
+					if (sender.hasPermission("slimefun.fix"))
+					{
+						ItemStack item = ((Player)sender).getInventory().getItemInMainHand();
+						if(item.getType() == Material.SKULL_ITEM && item.getDurability() == 3 && item.hasItemMeta() && ((SkullMeta)item.getItemMeta()).getOwner().equalsIgnoreCase("cscorelib") )
+						{
+							if (!(item.getItemMeta().hasDisplayName() && (item.getItemMeta().getDisplayName().contains("Backpack") || item.getItemMeta().getDisplayName().contains("Cooler"))))
+							{
+								String texture = CustomSkull.getTexture(item);
+								((Player)sender).sendMessage(ChatColor.translateAlternateColorCodes('&', "&eAttempting repair..."));
+								if(SlimefunItem.getByItem(item) == null && SlimefunItem.map_texture.containsKey(texture))
+								{
+									if(item.getAmount() != 1)
+									{
+										((Player)sender).sendMessage(ChatColor.translateAlternateColorCodes('&', "&cFailure! Please unstack your items!"));
+									}
+									else
+									{
+										ItemStack sfItem = SlimefunItem.getItem(SlimefunItem.map_texture.get(texture));
+										((Player)sender).sendMessage(ChatColor.translateAlternateColorCodes('&', "&aSuccess!"));
+										((Player)sender).getInventory().setItemInMainHand(sfItem);
+										System.out.println("Slimefun Fix > " + SlimefunItem.getByItem(sfItem).getName() + " fixed for player " + ((Player)sender).getName());
+									}
+								
+								}
+								else
+								{
+									((Player)sender).sendMessage(ChatColor.translateAlternateColorCodes('&', "&cFailure! You may create a ticket to get help from a SrMod+"));
+									((Player)sender).sendMessage(ChatColor.translateAlternateColorCodes('&', "&7(/ticket create)"));
+								}
+							}
+							else
+								((Player)sender).sendMessage(ChatColor.translateAlternateColorCodes('&', "&cSorry! Backpacks and coolers cannot be fixed!"));
+						}
+						else
+							((Player)sender).sendMessage(ChatColor.translateAlternateColorCodes('&', "&cSorry! You must hold a broken slimefun skull to use this!"));
+					}
+					else Messages.local.sendTranslation(sender, "messages.no-permission", true);
+				}
+				else Messages.local.sendTranslation(sender, "messages.only-players", true);
+			}
+			else if (args[0].equalsIgnoreCase("cheat")) {
 				if (sender instanceof Player) {
 					if (sender.hasPermission("slimefun.cheat.items")) SlimefunGuide.openCheatMenu((Player) sender);
 					else Messages.local.sendTranslation(sender, "messages.no-permission", true);
@@ -159,6 +207,33 @@ public class SlimefunCommand implements CommandExecutor, Listener {
 					}
 				}
 			}
+			else if (args[0].equalsIgnoreCase("backpack")) {
+				if (sender.hasPermission("slimefun.cheat.items"))
+				{
+					if (args.length > 2) {
+						if (sender instanceof Player) {
+							ItemStack item = ((Player)sender).getInventory().getItemInMainHand();
+							Player p = Bukkit.getPlayer(args[1]);
+							
+							if (item != null && item.hasItemMeta() && item.getItemMeta().hasLore()) {
+								for (int line = 0; line < item.getItemMeta().getLore().size(); line++) {
+									if (item.getItemMeta().getLore().get(line).equals("§7ID: <ID>")) {
+										ItemMeta im = item.getItemMeta();
+										List<String> lore = im.getLore();
+										lore.set(line, lore.get(line).replace("<ID>", p.getUniqueId() + "#" + args[2]));
+										im.setLore(lore);
+										item.setItemMeta(im);
+										break;
+									}
+								}
+							}
+						}
+					}
+					else
+						sender.sendMessage("Please enter a valid username and backpack id");
+				}
+				else Messages.local.sendTranslation(sender, "messages.no-permission", true);
+			}
 			else if (args[0].equalsIgnoreCase("timings")) {
 				if (sender.hasPermission("slimefun.command.timings")|| sender instanceof ConsoleCommandSender) {
 					SlimefunStartup.ticker.info(sender);
@@ -202,7 +277,15 @@ public class SlimefunCommand implements CommandExecutor, Listener {
 						if (Players.isOnline(args[1])) {
 							if (Slimefun.listIDs().contains(args[2].toUpperCase())) {
 								Messages.local.sendTranslation(Bukkit.getPlayer(args[1]), "messages.given-item", true, new Variable("%item%", SlimefunItem.getByName(args[2].toUpperCase()).getItem().getItemMeta().getDisplayName()), new Variable("%amount%", "1"));
-								Bukkit.getPlayer(args[1]).getInventory().addItem(SlimefunItem.getByName(args[2].toUpperCase()).getItem());
+								
+								HashMap<Integer, ItemStack> leftOver = new HashMap<Integer, ItemStack>();
+						        leftOver.putAll(Bukkit.getPlayer(args[1]).getInventory().addItem(SlimefunItem.getByName(args[2].toUpperCase()).getItem()));
+						        if (!leftOver.isEmpty())
+						        {
+						            Location loc = Bukkit.getPlayer(args[1]).getLocation();
+						            for (ItemStack i : leftOver.values())
+						            	Bukkit.getPlayer(args[1]).getWorld().dropItem(loc, i);
+						        }
 								Messages.local.sendTranslation(sender, "messages.give-item", true, new Variable("%player%", args[1]), new Variable("%item%", SlimefunItem.getByName(args[2].toUpperCase()).getItem().getItemMeta().getDisplayName()), new Variable("%amount%", "1"));
 							}
 							else Messages.local.sendTranslation(sender, "messages.not-valid-item", true, new Variable("%item%", args[2]));
@@ -217,7 +300,15 @@ public class SlimefunCommand implements CommandExecutor, Listener {
                                      
                                      if (amount > 0) {
                                          Messages.local.sendTranslation(Bukkit.getPlayer(args[1]), "messages.given-item", true, new Variable("%item%", SlimefunItem.getByName(args[2].toUpperCase()).getItem().getItemMeta().getDisplayName()), new Variable("%amount%", String.valueOf(amount)));
-                                         Bukkit.getPlayer(args[1]).getInventory().addItem(new CustomItem(SlimefunItem.getByName(args[2].toUpperCase()).getItem(), amount));
+                                         
+         								HashMap<Integer, ItemStack> leftOver = new HashMap<Integer, ItemStack>();
+        						        leftOver.putAll(Bukkit.getPlayer(args[1]).getInventory().addItem(new CustomItem(SlimefunItem.getByName(args[2].toUpperCase()).getItem(), amount)));
+        						        if (!leftOver.isEmpty())
+        						        {
+        						            Location loc = Bukkit.getPlayer(args[1]).getLocation();
+        						            for (ItemStack i : leftOver.values())
+        						            	Bukkit.getPlayer(args[1]).getWorld().dropItem(loc, i);
+        						        }
                                          Messages.local.sendTranslation(sender, "messages.give-item", true, new Variable("%player%", args[1]), new Variable("%item%", SlimefunItem.getByName(args[2].toUpperCase()).getItem().getItemMeta().getDisplayName()), new Variable("%amount%", String.valueOf(amount)));
                                      }
                                      else Messages.local.sendTranslation(sender, "messages.not-valid-amount", true, new Variable("%amount%", String.valueOf(amount)));

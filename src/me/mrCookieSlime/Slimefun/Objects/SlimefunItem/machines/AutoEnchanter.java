@@ -20,7 +20,9 @@ import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecip
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.mrCookieSlime.Slimefun.api.Slimefun;
 import me.mrCookieSlime.Slimefun.api.energy.ChargableBlock;
+import net.voidrealms.tinkertools.Objects.TinkerTool;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
@@ -101,6 +103,8 @@ public class AutoEnchanter extends AContainer {
 				
 				// Enchant
 				if (item != null && item.getType() == Material.ENCHANTED_BOOK && target != null) {
+					if (Bukkit.getPluginManager().isPluginEnabled("TinkerTools") && TinkerTool.isTinkerTool(target)) return;
+					if (Bukkit.getPluginManager().isPluginEnabled("Voiderium") && (SlimefunItem.getByItem(target) != null && SlimefunItem.getByItem(target).getName().contains("VOIDERIUM"))) return;
 					Map<Enchantment, Integer> enchantments = new HashMap<Enchantment, Integer>();
 					Set<ItemEnchantment> enchantments2 = new HashSet<ItemEnchantment>();
 					int amount = 0;

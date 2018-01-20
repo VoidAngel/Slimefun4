@@ -71,6 +71,7 @@ public class SlimefunStartup extends JavaPlugin {
 	static Config items;
 	static Config whitelist;
 	static Config config;
+	public static boolean aSkyBlock;
 
 	public static TickerTask ticker;
 
@@ -266,6 +267,7 @@ public class SlimefunStartup extends JavaPlugin {
 				@Override
 				public void run() {
 					Slimefun.emeraldenchants = getServer().getPluginManager().isPluginEnabled("EmeraldEnchants");
+					Slimefun.askyblock = getServer().getPluginManager().isPluginEnabled("ASkyBlock");
 					SlimefunGuide.all_recipes = config.getBoolean("options.show-vanilla-recipes-in-guide");
 					MiscSetup.loadItems();
 

@@ -24,6 +24,8 @@ import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.ReplacingAlloy;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.SlimefunItem;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.SlimefunMachine;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.machines.AutomatedCraftingChamber;
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.machines.AutomatedMagicWorkbench;
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.machines.AutomatedVanillaCrafter;
 import me.mrCookieSlime.Slimefun.api.Slimefun;
 import me.mrCookieSlime.Slimefun.api.SlimefunRecipes;
 
@@ -118,6 +120,86 @@ public class MiscSetup {
 				AutomatedCraftingChamber.recipes.put(builder.toString(), RecipeType.getRecipeOutputList((SlimefunMachine) SlimefunItem.getByID("ENHANCED_CRAFTING_TABLE"), inputs));
 			}
 			
+		}
+		
+		AutomatedMagicWorkbench mWorkbench = (AutomatedMagicWorkbench) SlimefunItem.getByID("AUTOMATED_MAGIC_WORKBENCH");
+		
+		if (mWorkbench != null) {
+//			Iterator<Recipe> recipes = Bukkit.recipeIterator();
+//			
+//			while (recipes.hasNext()) {
+//				Recipe r = recipes.next();
+//				boolean allow = true;
+//				if (Bukkit.getPluginManager().isPluginEnabled("SensibleToolbox")) {
+//					BaseSTBItem item = SensibleToolbox.getItemRegistry().fromItemStack(r.getResult());
+//					allow = item == null;
+//				}
+//				
+//				if (allow) {
+//					if (r instanceof ShapedRecipe) {
+//						
+//					}
+//					else if (r instanceof ShapelessRecipe) {
+//						
+//					}
+//				}
+//			}
+			
+			for (ItemStack[] inputs: RecipeType.getRecipeInputList((SlimefunMachine) SlimefunItem.getByID("MAGIC_WORKBENCH"))) {
+				StringBuilder builder = new StringBuilder();
+				int i = 0;
+				for (ItemStack item: inputs) {
+					if (i > 0) {
+						builder.append(" </slot> ");
+					}
+					
+					builder.append(CustomItemSerializer.serialize(item, ItemFlag.DATA, ItemFlag.ITEMMETA_DISPLAY_NAME, ItemFlag.ITEMMETA_LORE, ItemFlag.MATERIAL));
+					
+					i++;
+				}
+				
+				AutomatedMagicWorkbench.recipes.put(builder.toString(), RecipeType.getRecipeOutputList((SlimefunMachine) SlimefunItem.getByID("MAGIC_WORKBENCH"), inputs));
+			}
+			
+		}
+		
+		AutomatedVanillaCrafter vanillacrafter = (AutomatedVanillaCrafter) SlimefunItem.getByID("AUTOMATED_VANILLA_CRAFTER");
+		
+		if (vanillacrafter != null) {
+//			Iterator<Recipe> recipes = Bukkit.recipeIterator();
+//			
+//			while (recipes.hasNext()) {
+//				Recipe r = recipes.next();
+//				boolean allow = true;
+//				if (Bukkit.getPluginManager().isPluginEnabled("SensibleToolbox")) {
+//					BaseSTBItem item = SensibleToolbox.getItemRegistry().fromItemStack(r.getResult());
+//					allow = item == null;
+//				}
+//				
+//				if (allow) {
+//					if (r instanceof ShapedRecipe) {
+//						
+//					}
+//					else if (r instanceof ShapelessRecipe) {
+//						
+//					}
+//				}
+//			}
+			
+			for (ItemStack[] inputs: RecipeType.getVanillaRecipeInputList()) {
+				StringBuilder builder = new StringBuilder();
+				int i = 0;
+				for (ItemStack item: inputs) {
+					if (i > 0) {
+						builder.append(" </slot> ");
+					}
+					
+					builder.append(CustomItemSerializer.serialize(item, ItemFlag.DATA, ItemFlag.ITEMMETA_DISPLAY_NAME, ItemFlag.ITEMMETA_LORE, ItemFlag.MATERIAL));
+					
+					i++;
+				}
+				AutomatedVanillaCrafter.recipes.put(builder.toString().replace("DATA=-1", "DATA=0").replace("MATERIAL=AIR </sep> DATA=0 </sep> ITEMMETA_DISPLAY_NAME=NONE </sep> ITEMMETA_LORE=NONE", "NULL"), RecipeType.getVanillaRecipeOutputList(inputs));
+			}
 		}
 		
 		SlimefunItem grinder = SlimefunItem.getByID("GRIND_STONE");

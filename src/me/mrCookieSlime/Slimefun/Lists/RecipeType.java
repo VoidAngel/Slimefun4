@@ -1,16 +1,21 @@
 package me.mrCookieSlime.Slimefun.Lists;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
-
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.Item.CustomItem;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.SlimefunGadget;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.SlimefunItem;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.SlimefunMachine;
 import me.mrCookieSlime.Slimefun.api.SlimefunRecipes;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Recipe;
+import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.ShapelessRecipe;
 
 public class RecipeType {
 	
@@ -85,6 +90,38 @@ public class RecipeType {
 		return convertable;
 	}
 	
+	public static List<ItemStack[]> getVanillaRecipeInputList() {
+		List<ItemStack[]> recipes = getVanillaRecipes();
+		List<ItemStack[]> convertable = new ArrayList<ItemStack[]>();
+		for (int i = 0; i < recipes.size(); i++) {
+			if (i % 2 == 0) convertable.add(recipes.get(i));
+		}
+		return convertable;
+	}
+	
+	public static List<ItemStack[]> getVanillaRecipes()
+	{
+        final List<ItemStack[]> items = new ArrayList<ItemStack[]>();
+        final Iterator<Recipe> iterator = (Iterator<Recipe>)Bukkit.recipeIterator();
+        while (iterator.hasNext()) {
+            final Recipe r = iterator.next();
+            if (r == null) continue;
+            if (r instanceof ShapedRecipe) {
+        	   ShapedRecipe recipe=(ShapedRecipe)r;
+        	   ItemStack[] rItems = recipe.getIngredientMap().values().toArray(new ItemStack[recipe.getIngredientMap().values().size()]);
+        	   items.add(rItems);
+        	   items.add(new ItemStack[]{recipe.getResult()});
+           }
+            else if (r instanceof ShapelessRecipe) {
+            	ShapelessRecipe recipe=(ShapelessRecipe)r;
+            	ItemStack[] rItems = recipe.getIngredientList().toArray(new ItemStack[recipe.getIngredientList().size()]);
+            	items.add(rItems);
+         	   	items.add(new ItemStack[]{recipe.getResult()});
+            }
+        }
+		return items;
+	}
+	
 	public static ItemStack getRecipeOutput(SlimefunItem machine, ItemStack input) {
 		List<ItemStack[]> recipes = (machine instanceof SlimefunMachine ? ((SlimefunMachine) machine).getRecipes(): ((SlimefunGadget) machine).getRecipes());
 		return recipes.get(((getRecipeInputs(machine).indexOf(input) * 2) + 1))[0];
@@ -93,5 +130,19 @@ public class RecipeType {
 	public static ItemStack getRecipeOutputList(SlimefunItem machine, ItemStack[] input) {
 		List<ItemStack[]> recipes = (machine instanceof SlimefunMachine ? ((SlimefunMachine) machine).getRecipes(): ((SlimefunGadget) machine).getRecipes());
 		return recipes.get(((getRecipeInputList(machine).indexOf(input) * 2) + 1))[0];
+	}
+	
+	public static ItemStack getVanillaRecipeOutputList(ItemStack[] input) {
+		List<ItemStack[]> recipes = getVanillaRecipes();
+		List<ItemStack[]> items = getVanillaRecipeInputList();
+		
+		for(int i = 0; i < items.size(); i++)
+		{
+			if(Arrays.equals(input, items.get(i)))
+			{
+				return recipes.get((i * 2) + 1)[0];
+			}
+		}
+		return null;
 	}
 }

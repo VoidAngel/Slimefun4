@@ -24,9 +24,11 @@ import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -216,13 +218,13 @@ public class ItemListener implements Listener {
 						float cost = 0.3F;
 						if (charge >= cost) {
 							p.setItemInHand(ItemEnergy.chargeItem(item, -cost));
-							Bukkit.getPluginManager().callEvent(new ItemUseEvent(e.getParentEvent(), SlimefunItem.getByName((String) Slimefun.getItemValue(SlimefunItem.getByItem(tool).getName(), "mode." + modes.get(index) + ".item")).getItem(), e.getClickedBlock()));
+							Bukkit.getPluginManager().callEvent(new ItemUseEvent(e.getParentEvent(), SlimefunItem.getByName((String) Slimefun.getItemValue(SlimefunItem.getByItem(tool).getID(), "mode." + modes.get(index) + ".item")).getItem(), e.getClickedBlock()));
 						}
 					}
 					else {
 						index++;
 						if (index == modes.size()) index = 0;
-						Messages.local.sendTranslation(p, "messages.mode-change", true, new Variable("%device%", "Multi Tool"), new Variable("%mode%", (String) Slimefun.getItemValue(SlimefunItem.getByItem(tool).getName(), "mode." + modes.get(index) + ".name")));
+						Messages.local.sendTranslation(p, "messages.mode-change", true, new Variable("%device%", "Multi Tool"), new Variable("%mode%", (String) Slimefun.getItemValue(SlimefunItem.getByItem(tool).getID(), "mode." + modes.get(index) + ".name")));
 						Variables.mode.put(p.getUniqueId(), index);
 					}
 				}
@@ -355,6 +357,12 @@ public class ItemListener implements Listener {
         		Messages.local.sendTranslation((Player) e.getWhoClicked(), "workbench.not-enhanced", true);
         		break;
         	}
+        	else if(SlimefunManager.isItemSimiliar(item, SlimefunItems.CHARCOAL_BLOCK, false))
+        	{
+           		e.setCancelled(true);
+        		Messages.local.sendTranslation((Player) e.getWhoClicked(), "workbench.not-enhanced", true);
+        		break;
+        	}
         }
     }
 
@@ -386,4 +394,37 @@ public class ItemListener implements Listener {
             }
         }
     }
+	
+	@EventHandler(priority=EventPriority.LOWEST)
+    public void onItemPickup(PlayerPickupItemEvent e) {
+		ItemStack item = e.getItem().getItemStack();
+		
+		if(item.getType() == Material.SKULL_ITEM && item.getDurability() == 3 && item.hasItemMeta() && ((SkullMeta)item.getItemMeta()).hasOwner() && ((SkullMeta)item.getItemMeta()).getOwner().equalsIgnoreCase("cscorelib") )
+		{
+			if (!(item.getItemMeta().hasDisplayName() && (item.getItemMeta().getDisplayName().contains("Backpack") || item.getItemMeta().getDisplayName().contains("Cooler") || item.getItemMeta().getDisplayName().contains("Soul Jar"))))
+			{
+				String texture = CustomSkull.getTexture(item);
+				if(SlimefunItem.getByItem(item) == null && SlimefunItem.map_texture.containsKey(texture))
+				{
+					if(item.getAmount() != 1)
+					{
+						SlimefunItem sf = SlimefunItem.getByID(SlimefunItem.map_texture.get(texture));
+						if(sf.getID().contains("HOTBAR_PET")) return;
+						ItemStack sfItem = sf.getItem().clone();
+						sfItem.setAmount(item.getAmount());
+						e.getItem().getItemStack().setItemMeta(sfItem.getItemMeta());
+						System.out.println("Slimefun Fix > " +  sfItem.getAmount() + "x " + sf.getID() + " drop fixed for player " + e.getPlayer().getName());
+					}
+					else
+					{
+						SlimefunItem sf = SlimefunItem.getByID(SlimefunItem.map_texture.get(texture));
+						if(sf.getID().contains("HOTBAR_PET")) return;
+						ItemStack sfItem = sf.getItem().clone();
+						e.getItem().getItemStack().setItemMeta(sfItem.getItemMeta());
+						System.out.println("Slimefun Fix > " + sf.getID() + " drop fixed for player " + e.getPlayer().getName());
+					}
+				}
+			}
+		}
+	}
 }
