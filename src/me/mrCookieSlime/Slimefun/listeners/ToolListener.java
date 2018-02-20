@@ -13,6 +13,7 @@ import org.bukkit.block.Furnace;
 import org.bukkit.block.Hopper;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -290,7 +291,9 @@ public class ToolListener implements Listener {
 			e.getBlock().setType(Material.AIR);
 			for (ItemStack drop: drops) {
 				if (drop != null) {
-					e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), drop);
+					Item i = e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), drop);
+					if(sfItem != null || drop.getType() == Material.SKULL_ITEM)
+						i.setPickupDelay(0);
 				}
 			}
 		}

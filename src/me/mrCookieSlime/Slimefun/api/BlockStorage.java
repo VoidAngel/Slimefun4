@@ -36,6 +36,7 @@ public class BlockStorage {
 	public static Map<String, BlockStorage> worlds = new HashMap<String, BlockStorage>();
 	public static Map<String, Set<Block>> ticking_chunks = new HashMap<String, Set<Block>>();
 	public static Set<String> loaded_tickers = new HashSet<String>();
+	public static Set<String> loaded_mufflers = new HashSet<String>();
 	
 	private World world;
 	
@@ -98,6 +99,8 @@ public class BlockStorage {
 							try {
 								totalBlocks++;
 								storage.put(deserializeLocation(key), cfg.getString(key));
+								if(file.getName().replace(".sfb", "").toString().equals("SOUND_MUFFLER"))
+									loaded_mufflers.add(key);
 								
 								if (SlimefunItem.isTicking(file.getName().replace(".sfb", ""))) {
 									Set<Block> blocks = ticking_chunks.containsKey(deserializeLocation(key).getChunk().toString()) ? ticking_chunks.get(deserializeLocation(key).getChunk().toString()): new HashSet<Block>();

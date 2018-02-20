@@ -279,13 +279,14 @@ public class CargoNet {
 								Block target = getAttachedBlock(out.getBlock());
 								if (target != null) {
 									stack = CargoManager.insert(out.getBlock(), storage, target, stack, -1);
+									//System.out.println("CARGONET 281 "+ out.getBlockX() + " " + target + " " + stack);
 									if (stack == null) break destinations;
 								}
 							}
 						}
 						
 						if (stack != null && previousSlot > -1) {
-							if (storage.hasUniversalInventory(inputTarget)) {
+							if (inputTarget != null && storage.hasUniversalInventory(inputTarget)) {
 								UniversalBlockMenu menu = storage.getUniversalInventory(inputTarget);
 								menu.replaceExistingItem(previousSlot, stack);
 							}
@@ -304,7 +305,7 @@ public class CargoNet {
 						List<StoredItem> items = new ArrayList<StoredItem>();
 						for (Location l: providers) {
 							Block target = getAttachedBlock(l.getBlock());
-							if (storage.hasUniversalInventory(target)) {
+							if (target != null && storage.hasUniversalInventory(target)) {
 								UniversalBlockMenu menu = storage.getUniversalInventory(target);
 								for (int slot: menu.getPreset().getSlotsAccessedByItemTransport(menu, ItemTransportFlow.WITHDRAW, null)) {
 									ItemStack is = menu.getItemInSlot(slot);

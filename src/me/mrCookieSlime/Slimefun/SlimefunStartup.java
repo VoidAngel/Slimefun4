@@ -3,6 +3,7 @@ package me.mrCookieSlime.Slimefun;
 import java.io.File;
 
 import me.mrCookieSlime.Slimefun.listeners.*;
+
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -72,6 +73,8 @@ public class SlimefunStartup extends JavaPlugin {
 	static Config whitelist;
 	static Config config;
 	public static boolean aSkyBlock;
+	
+	private SoundMufflerListener soundMufflerListener;
 
 	public static TickerTask ticker;
 
@@ -80,6 +83,7 @@ public class SlimefunStartup extends JavaPlugin {
 	private boolean clearlag = false;
 	private boolean exoticGarden = false;
 	private boolean coreProtect = false;
+	private boolean protocolLib = false;
 
 	// Supported Versions of Minecraft
 	final String[] supported = {"v1_9_", "v1_10_", "v1_11_", "v1_12_"};
@@ -366,13 +370,21 @@ public class SlimefunStartup extends JavaPlugin {
 				}
 			}, 80L, 60 * 60 * 20L);
 			
+
+			
 			// Hooray!
 			System.out.println("[Slimefun] Finished!");
 
 			clearlag = getServer().getPluginManager().isPluginEnabled("ClearLag");
 
 			coreProtect = getServer().getPluginManager().isPluginEnabled("CoreProtect");
-
+			
+			protocolLib = getServer().getPluginManager().isPluginEnabled("ProtocolLib");
+			
+	        if (isProtocolLibInstalled()) {
+	            soundMufflerListener = new SoundMufflerListener(this);
+	            soundMufflerListener.start();
+	        }
             Bukkit.getScheduler().scheduleSyncDelayedTask(this, new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -515,7 +527,11 @@ public class SlimefunStartup extends JavaPlugin {
 	public boolean isExoticGardenInstalled () {
 		return exoticGarden;
 	}
-
+	
+    private boolean isProtocolLibInstalled() {
+    	return protocolLib;
+    }
+    
 	public boolean isCoreProtectInstalled() {
 		return coreProtect;
 	}
@@ -523,4 +539,6 @@ public class SlimefunStartup extends JavaPlugin {
 	public CoreProtectAPI getCoreProtectAPI() {
 		return coreProtectAPI;
 	}
+	
+
 }

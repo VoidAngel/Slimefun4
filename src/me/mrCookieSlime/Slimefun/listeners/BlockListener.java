@@ -16,25 +16,48 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 
 public class BlockListener implements Listener {
 	
 	public BlockListener(SlimefunStartup plugin) {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
-	
+
+	@EventHandler
+	public void onBlockFall(EntityChangeBlockEvent event) {
+		if (event.getEntity() instanceof FallingBlock) {
+			if (BlockStorage.hasBlockInfo(event.getBlock())) {
+				BlockStorage.clearBlockInfo(event.getBlock());
+				event.setCancelled(true);
+				FallingBlock fb = (FallingBlock) event.getEntity();
+				if (fb.getDropItem()) {
+					fb.getWorld().dropItemNaturally(fb.getLocation(), new ItemStack(fb.getMaterial(), 1, fb.getBlockData()));
+				}
+			}
+		}
+	}
+
 	@EventHandler
 	public void onPistonExtend(BlockPistonExtendEvent e) {
 		for (Block b : e.getBlocks()) {
 			if (BlockStorage.hasBlockInfo(b)) {
+				e.setCancelled(true);
+				return;
+			}
+			else if(BlockStorage.hasBlockInfo(b.getRelative(e.getDirection()))) {
+				if(b.getRelative(e.getDirection()) == null || b.getRelative(e.getDirection()).getType() == Material.AIR) 
+					BlockStorage.clearBlockInfo(b.getRelative(e.getDirection()));
 				e.setCancelled(true);
 				return;
 			}
@@ -46,6 +69,12 @@ public class BlockListener implements Listener {
 		if (e.isSticky()) {
 			for (Block b : e.getBlocks()) {
 				if (BlockStorage.hasBlockInfo(b)) {
+					e.setCancelled(true);
+					return;
+				}
+				else if(BlockStorage.hasBlockInfo(b.getRelative(e.getDirection()))) {
+					if(b.getRelative(e.getDirection()) == null || b.getRelative(e.getDirection()).getType() == Material.AIR) 
+						BlockStorage.clearBlockInfo(b.getRelative(e.getDirection()));
 					e.setCancelled(true);
 					return;
 				}

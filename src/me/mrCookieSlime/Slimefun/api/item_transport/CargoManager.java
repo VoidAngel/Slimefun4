@@ -19,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 public class CargoManager {
 	
 	public static ItemStack withdraw(Block node, BlockStorage storage, Block target, ItemStack template) {
+		if(target == null) return null;
 		if (storage.hasUniversalInventory(target)) {
 			UniversalBlockMenu menu = storage.getUniversalInventory(target);
 			for (int slot: menu.getPreset().getSlotsAccessedByItemTransport(menu, ItemTransportFlow.WITHDRAW, null)) {
@@ -71,6 +72,7 @@ public class CargoManager {
 	}
 	
 	public static ItemSlot withdraw(Block node, BlockStorage storage, Block target, int index) {
+		if(target == null) return null;
 		if (storage.hasUniversalInventory(target)) {
 			UniversalBlockMenu menu = storage.getUniversalInventory(target);
 			for (int slot: menu.getPreset().getSlotsAccessedByItemTransport(menu, ItemTransportFlow.WITHDRAW, null)) {
@@ -105,6 +107,7 @@ public class CargoManager {
 	}
 	
 	public static ItemStack insert(Block node, BlockStorage storage, Block target, ItemStack stack, int index) {
+		if(target == null) return null;
 		if (!matchesFilter(node, stack, index)) return stack;
 		if (storage.hasUniversalInventory(target)) {
 			UniversalBlockMenu menu = storage.getUniversalInventory(target);

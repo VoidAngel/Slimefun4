@@ -21,7 +21,7 @@ public abstract class ElectrifiedComposter extends AContainer {
 		registerRecipe(10, new ItemStack[] {new ItemStack(Material.ROTTEN_FLESH, 8)}, new ItemStack[]{new ItemStack(Material.DIRT)});
 		registerRecipe(10, new ItemStack[] {new ItemStack(Material.STONE, 4)}, new ItemStack[]{new ItemStack(Material.NETHERRACK)});
 		registerRecipe(10, new ItemStack[] {new ItemStack(Material.NETHER_STALK, 2)}, new ItemStack[]{new ItemStack(Material.NETHERRACK)});
-		registerRecipe(10, new ItemStack[] {new ItemStack(Material.SAND, 2)}, new ItemStack[]{new ItemStack(Material.SOUL_SAND)});
+		registerRecipe(10, new ItemStack[] {new ItemStack(Material.SAND, 8)}, new ItemStack[]{new ItemStack(Material.SOUL_SAND)});
 		registerRecipe(10, new ItemStack[] {new ItemStack(Material.WHEAT, 4)}, new ItemStack[]{new ItemStack(Material.NETHER_STALK)});
 	}
 	

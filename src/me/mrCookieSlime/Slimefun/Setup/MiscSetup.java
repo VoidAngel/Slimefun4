@@ -26,6 +26,7 @@ import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.SlimefunMachine;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.machines.AutomatedCraftingChamber;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.machines.AutomatedMagicWorkbench;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.machines.AutomatedVanillaCrafter;
+import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.mrCookieSlime.Slimefun.api.Slimefun;
 import me.mrCookieSlime.Slimefun.api.SlimefunRecipes;
 
