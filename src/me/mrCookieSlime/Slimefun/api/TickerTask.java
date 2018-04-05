@@ -94,6 +94,11 @@ public class TickerTask implements Runnable {
 												map_machine.put(item.getID(), (map_machine.containsKey(item.getID()) ? map_machine.get(item.getID()): 0) + 1);
 												block_timings.put(l, System.currentTimeMillis() - timestamp3);
 											} catch(Exception x) {
+												if(b.getType() == null || b.getType() != item.getItem().getType())
+												{
+													System.out.println("CLEARING UNUSED " + item.getID() + " AT " + l.toString());
+													//BlockStorage.clearBlockInfo(b);
+												}
 												int errors = 0;
 												if (bugged.containsKey(l)) errors = bugged.get(l);
 												errors++;

@@ -46,6 +46,8 @@ import me.mrCookieSlime.Slimefun.Misc.BookDesign;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.Juice;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.MultiTool;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.SlimefunItem;
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.Interfaces.NotPlaceable;
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.handlers.BlockPlaceHandler;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.handlers.ItemHandler;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.handlers.ItemInteractionHandler;
 import me.mrCookieSlime.Slimefun.Setup.Messages;
@@ -422,6 +424,39 @@ public class ItemListener implements Listener {
 						ItemStack sfItem = sf.getItem().clone();
 						e.getItem().getItemStack().setItemMeta(sfItem.getItemMeta());
 						System.out.println("Slimefun Fix > " + sf.getID() + " drop fixed for player " + e.getPlayer().getName());
+					}
+				}
+			}
+		}
+	}
+	
+	@SuppressWarnings("deprecation")
+	@EventHandler(priority=EventPriority.LOWEST)
+    public void onInteract(PlayerInteractEvent e) {
+		if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
+			if (!e.getHand().equals(EquipmentSlot.HAND)) return;
+			Block b = e.getClickedBlock();
+			if(b != null && b.getType() == Material.SKULL) 
+			{
+				Skull skull = (Skull) b.getState();
+				if(skull.hasOwner() && skull.getOwner().equalsIgnoreCase("cscorelib"))
+				{
+					String texture = "";
+					try {
+						texture = CustomSkull.getTexture(b);
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
+					if(!BlockStorage.hasBlockInfo(b) && SlimefunItem.map_texture.containsKey(texture))
+					{
+						SlimefunItem sfItem = SlimefunItem.getByID(SlimefunItem.map_texture.get(texture));
+						if (sfItem != null && !(sfItem instanceof NotPlaceable)){
+							BlockStorage.addBlockInfo(b, "id", sfItem.getID(), true);
+							if (SlimefunItem.blockhandler.containsKey(sfItem.getID())) {
+								SlimefunItem.blockhandler.get(sfItem.getID()).onPlace(e.getPlayer(), b, sfItem);
+							}
+							System.out.println("Slimefun Fix > " + sfItem.getID() + " block fixed for player " + e.getPlayer().getName());	
+						}
 					}
 				}
 			}

@@ -277,7 +277,7 @@ public class CargoNet {
 							destinations:
 							for (Location out: outputlist) {
 								Block target = getAttachedBlock(out.getBlock());
-								if (target != null) {
+								if (target != null && out.getBlock() != null) {
 									stack = CargoManager.insert(out.getBlock(), storage, target, stack, -1);
 									//System.out.println("CARGONET 281 "+ out.getBlockX() + " " + target + " " + stack);
 									if (stack == null) break destinations;

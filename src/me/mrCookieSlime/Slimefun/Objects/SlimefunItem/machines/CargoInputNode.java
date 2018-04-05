@@ -11,6 +11,7 @@ import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu.MenuClickHan
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ClickAction;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.Item.CustomItem;
 import me.mrCookieSlime.CSCoreLibPlugin.general.World.CustomSkull;
+import me.mrCookieSlime.Slimefun.Variables;
 import me.mrCookieSlime.Slimefun.Lists.RecipeType;
 import me.mrCookieSlime.Slimefun.Lists.SlimefunItems;
 import me.mrCookieSlime.Slimefun.Objects.Category;
@@ -49,6 +50,7 @@ public class CargoInputNode extends SlimefunItem {
 							@Override
 							public boolean onClick(Player p, int arg1, ItemStack arg2, ClickAction arg3) {
 								BlockStorage.addBlockInfo(b, "filter-type", "blacklist");
+								Variables.cargoFilterType.put(b.getLocation(), "blacklist");
 								newInstance(menu, b);
 								return false;
 							}
@@ -61,6 +63,7 @@ public class CargoInputNode extends SlimefunItem {
 							@Override
 							public boolean onClick(Player p, int arg1, ItemStack arg2, ClickAction arg3) {
 								BlockStorage.addBlockInfo(b, "filter-type", "whitelist");
+								Variables.cargoFilterType.put(b.getLocation(), "whitelist");
 								newInstance(menu, b);
 								return false;
 							}
@@ -74,6 +77,7 @@ public class CargoInputNode extends SlimefunItem {
 							@Override
 							public boolean onClick(Player p, int arg1, ItemStack arg2, ClickAction arg3) {
 								BlockStorage.addBlockInfo(b, "filter-durability", "true");
+								Variables.cargoDurability.put(b.getLocation(), true);
 								newInstance(menu, b);
 								return false;
 							}
@@ -86,6 +90,7 @@ public class CargoInputNode extends SlimefunItem {
 							@Override
 							public boolean onClick(Player p, int arg1, ItemStack arg2, ClickAction arg3) {
 								BlockStorage.addBlockInfo(b, "filter-durability", "false");
+								Variables.cargoDurability.put(b.getLocation(), false);
 								newInstance(menu, b);
 								return false;
 							}
@@ -124,6 +129,7 @@ public class CargoInputNode extends SlimefunItem {
 							@Override
 							public boolean onClick(Player p, int arg1, ItemStack arg2, ClickAction arg3) {
 								BlockStorage.addBlockInfo(b, "filter-lore", "false");
+								Variables.cargoLore.put(b.getLocation(), false);
 								newInstance(menu, b);
 								return false;
 							}
@@ -136,6 +142,7 @@ public class CargoInputNode extends SlimefunItem {
 							@Override
 							public boolean onClick(Player p, int arg1, ItemStack arg2, ClickAction arg3) {
 								BlockStorage.addBlockInfo(b, "filter-lore", "true");
+								Variables.cargoLore.put(b.getLocation(), true);
 								newInstance(menu, b);
 								return false;
 							}
@@ -226,9 +233,12 @@ public class CargoInputNode extends SlimefunItem {
 			@Override
 			public void onPlace(Player p, Block b, SlimefunItem item) {
 				BlockStorage.addBlockInfo(b, "owner", p.getUniqueId().toString());
-				BlockStorage.addBlockInfo(b, "index", "0");
-				BlockStorage.addBlockInfo(b, "frequency", "0");
-				BlockStorage.addBlockInfo(b, "filter-type", "whitelist");
+				if(BlockStorage.getBlockInfo(b, "index") == null)
+					BlockStorage.addBlockInfo(b, "index", "0");
+				if(BlockStorage.getBlockInfo(b, "frequency") == null)
+					BlockStorage.addBlockInfo(b, "frequency", "0");
+				if(BlockStorage.getBlockInfo(b, "whitelist") == null)
+					BlockStorage.addBlockInfo(b, "filter-type", "whitelist");
 				BlockStorage.addBlockInfo(b, "filter-lore", "true");
 				BlockStorage.addBlockInfo(b, "filter-durability", "false");
 				BlockStorage.addBlockInfo(b, "round-robin", "false");
@@ -239,6 +249,9 @@ public class CargoInputNode extends SlimefunItem {
 				for (int slot: getInputSlots()) {
 					if (BlockStorage.getInventory(b).getItemInSlot(slot) != null) b.getWorld().dropItemNaturally(b.getLocation(), BlockStorage.getInventory(b).getItemInSlot(slot));
 				}
+				Variables.cargoLore.remove(b.getLocation());
+				Variables.cargoDurability.remove(b.getLocation());
+				Variables.cargoFilterType.remove(b.getLocation());
 				return true;
 			}
 		});

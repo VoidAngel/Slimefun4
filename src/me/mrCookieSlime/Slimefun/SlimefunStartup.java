@@ -73,6 +73,7 @@ public class SlimefunStartup extends JavaPlugin {
 	static Config whitelist;
 	static Config config;
 	public static boolean aSkyBlock;
+	public static boolean useWhitelist;
 	
 	private SoundMufflerListener soundMufflerListener;
 
@@ -146,7 +147,6 @@ public class SlimefunStartup extends JavaPlugin {
 
 			// Init Config, Updater, Metrics and messages.yml
 			utils.setupUpdater(53485, getFile());
-			utils.setupMetrics();
 			utils.setupLocalization();
 			config = utils.getConfig();
 			Messages.local = utils.getLocalization();
@@ -184,6 +184,7 @@ public class SlimefunStartup extends JavaPlugin {
 			MiscSetup.setupMisc();
 
 			BlockStorage.info_delay = config.getInt("URID.info-delay");
+			useWhitelist = config.getBoolean("options.use-whitelist");
 
 			System.out.println("[Slimefun] Loading World Generators...");
 

@@ -21,6 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
@@ -55,9 +56,8 @@ public class BlockListener implements Listener {
 				e.setCancelled(true);
 				return;
 			}
-			else if(BlockStorage.hasBlockInfo(b.getRelative(e.getDirection()))) {
-				if(b.getRelative(e.getDirection()) == null || b.getRelative(e.getDirection()).getType() == Material.AIR) 
-					BlockStorage.clearBlockInfo(b.getRelative(e.getDirection()));
+			else if(b.getRelative(e.getDirection()) == null && BlockStorage.hasBlockInfo(b.getRelative(e.getDirection()))) {
+				BlockStorage.clearBlockInfo(b.getRelative(e.getDirection()));
 				e.setCancelled(true);
 				return;
 			}
@@ -72,9 +72,8 @@ public class BlockListener implements Listener {
 					e.setCancelled(true);
 					return;
 				}
-				else if(BlockStorage.hasBlockInfo(b.getRelative(e.getDirection()))) {
-					if(b.getRelative(e.getDirection()) == null || b.getRelative(e.getDirection()).getType() == Material.AIR) 
-						BlockStorage.clearBlockInfo(b.getRelative(e.getDirection()));
+				else if(b.getRelative(e.getDirection()) == null && BlockStorage.hasBlockInfo(b.getRelative(e.getDirection()))) {
+					BlockStorage.clearBlockInfo(b.getRelative(e.getDirection()));
 					e.setCancelled(true);
 					return;
 				}
@@ -159,4 +158,12 @@ public class BlockListener implements Listener {
 			}
 		}
 	}
+	
+    @EventHandler
+    public void onFireSpread(BlockBurnEvent e) {
+        if (e.getBlock() == null) return;
+
+        String id = BlockStorage.checkID(e.getBlock());
+        if (id != null && id.startsWith("BARREL_")) e.setCancelled(true);
+    }
 }

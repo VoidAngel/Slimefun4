@@ -23,6 +23,7 @@ import org.bukkit.inventory.ShapedRecipe;
 import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.MaterialData;
+import org.bukkit.plugin.Plugin;
 
 import me.mrCookieSlime.CSCoreLibPlugin.PlayerRunnable;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Chat.TellRawMessage;
@@ -235,7 +236,7 @@ public class SlimefunGuide {
 				return false;
 			}
 		});
-		
+		disableEmptyClicks(menu);
 		menu.open(p);
 	}
 
@@ -327,7 +328,7 @@ public class SlimefunGuide {
 				}
 			});
 		}
-		
+		disableEmptyClicks(menu);
 		menu.open(p);
 	}
 
@@ -336,15 +337,53 @@ public class SlimefunGuide {
 	}
 	
 	public static void openGuide(Player p, boolean book) {
-		if (!SlimefunStartup.getWhitelist().getBoolean(p.getWorld().getName() + ".enabled")) return;
-		if (!SlimefunStartup.getWhitelist().getBoolean(p.getWorld().getName() + ".enabled-items.SLIMEFUN_GUIDE")) return;
-		if (!history.containsKey(p.getUniqueId())) openMainMenu(p, true, book, 1);
+		if(SlimefunStartup.useWhitelist){
+			if (!SlimefunStartup.getWhitelist().getBoolean(p.getWorld().getName() + ".enabled")) return;
+			if (!SlimefunStartup.getWhitelist().getBoolean(p.getWorld().getName() + ".enabled-items.SLIMEFUN_GUIDE")) return;
+		}
+		if (!history.containsKey(p.getUniqueId())){
+			p.sendMessage(ChatColor.GREEN + "Loading menu...");
+	        Bukkit.getScheduler().runTaskAsynchronously((Plugin)SlimefunStartup.instance, (Runnable)new Runnable() {
+	            @Override
+	            public void run() {
+	            	openMainMenu(p, true, book, 1);
+	            }});
+		}
 		else {
 			URID last = getLastEntry(p, false);
-			if (URID.decode(last) instanceof Category) openCategory(p, (Category) URID.decode(last), true, 1, book);
-			else if (URID.decode(last) instanceof SlimefunItem) displayItem(p, ((SlimefunItem) URID.decode(last)).getItem(), false, book, 0);
-			else if (URID.decode(last) instanceof GuideHandler) ((GuideHandler) URID.decode(last)).run(p, true, book);
-			else displayItem(p, (ItemStack) URID.decode(last), false, book, 0);
+			if (URID.decode(last) instanceof Category){
+				Category cat = (Category) URID.decode(last);
+				p.sendMessage(ChatColor.GREEN + "Loading menu...");
+		        Bukkit.getScheduler().runTaskAsynchronously((Plugin)SlimefunStartup.instance, (Runnable)new Runnable() {
+		            @Override
+		            public void run() {
+		            	openCategory(p, cat, true, 1, book);
+		            }});
+			}
+			else if (URID.decode(last) instanceof SlimefunItem) {
+				p.sendMessage(ChatColor.GREEN + "Loading menu...");
+		        Bukkit.getScheduler().runTaskAsynchronously((Plugin)SlimefunStartup.instance, (Runnable)new Runnable() {
+		            @Override
+		            public void run() {
+		            	displayItem(p, ((SlimefunItem) URID.decode(last)).getItem(), false, book, 0);
+		            }});
+			}
+			else if (URID.decode(last) instanceof GuideHandler) {
+				p.sendMessage(ChatColor.GREEN + "Loading menu...");
+		        Bukkit.getScheduler().runTaskAsynchronously((Plugin)SlimefunStartup.instance, (Runnable)new Runnable() {
+		            @Override
+		            public void run() {
+		            	((GuideHandler) URID.decode(last)).run(p, true, book);
+		            }});
+			}
+			else {
+				p.sendMessage(ChatColor.GREEN + "Loading menu...");
+		        Bukkit.getScheduler().runTaskAsynchronously((Plugin)SlimefunStartup.instance, (Runnable)new Runnable() {
+		            @Override
+		            public void run() {
+		            	displayItem(p, (ItemStack) URID.decode(last), false, book, 0);
+		            }});
+			}
 		}
 	}
 	
@@ -645,7 +684,7 @@ public class SlimefunGuide {
 					return false;
 				}
 			});
-			
+			disableEmptyClicks(menu);
 			menu.open(p);
 		}
 	}
@@ -658,7 +697,6 @@ public class SlimefunGuide {
 	@SuppressWarnings("deprecation")
 	public static void openCategory(final Player p, final Category category, final boolean survival, final int selected_page, final boolean book) {
 		if (category == null) return;
-
 		if (book && category.getItems().size() < 250) {
 			List<TellRawMessage> pages = new ArrayList<TellRawMessage>();
 			List<String> texts = new ArrayList<String>();
@@ -774,6 +812,7 @@ public class SlimefunGuide {
 			new CustomBookOverlay("Slimefun Guide", "mrCookieSlime", pages.toArray(new TellRawMessage[pages.size()])).open(p);
 		}
 		else {
+			
 			final ChestMenu menu = new ChestMenu("Slimefun Guide");
 			
 			menu.addMenuOpeningHandler(new MenuOpeningHandler() {
@@ -852,7 +891,6 @@ public class SlimefunGuide {
 					return false;
 				}
 			});
-			
 			int category_index = category_size * (selected_page - 1);
 			for (int i = 0; i < category_size; i++) {
 				int target = category_index + i;
@@ -924,10 +962,9 @@ public class SlimefunGuide {
 					}
 				}
 			}
-			
-			menu.open(p);
+			disableEmptyClicks(menu);
+			menu.open(p);			
 		}		
-
 		if (survival) {
 			addToHistory(p, category.getURID());
 		}
@@ -1192,7 +1229,6 @@ public class SlimefunGuide {
 		
 		menu.addItem(16, recipeOutput);
 		menu.addMenuClickHandler(16, new MenuClickHandler() {
-			
 			@Override
 			public boolean onClick(Player p, int slot, ItemStack item, ClickAction action) {
 				return false;
@@ -1316,7 +1352,7 @@ public class SlimefunGuide {
 				}
 			}
 		}
-		
+		disableEmptyClicks(menu);
 		menu.build().open(p);
 	}
 	
@@ -1339,6 +1375,21 @@ public class SlimefunGuide {
         final int seconds = (int)l;
         timeleft = String.valueOf(timeleft) + seconds + "s";
         return "&7" + timeleft;
+	}
+	
+	public static void disableEmptyClicks(ChestMenu menu) {
+		menu.getItemInSlot(0);
+		for(int j = 0; j < menu.toInventory().getSize(); j++)
+		{
+			if(menu.getItemInSlot(j) == null || menu.getItemInSlot(j).getType() == Material.AIR) {
+				menu.addMenuClickHandler(j, new MenuClickHandler() {
+					@Override
+					public boolean onClick(Player arg0, int arg1, ItemStack arg2, ClickAction arg3) {
+						return false;
+					}
+				});
+			}
+		}
 	}
 
 }

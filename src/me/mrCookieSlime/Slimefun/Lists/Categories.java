@@ -34,6 +34,7 @@ public class Categories {
 	public static Category TECH = new Category(new CustomArmor(new MenuItem(Material.LEATHER_CHESTPLATE, "&7Technical Gadgets", 0, "open"), Color.SILVER), 3);
 	public static Category RESOURCES = null;
 	public static Category CARGO = null;
+	public static Category BARRELS = new Category(new MenuItem(Material.LOG, "&aBarrels", 0, "&a> Click to open"), 2);
 	public static Category TECH_MISC = new Category(new MenuItem(Material.REDSTONE_COMPARATOR, "&7Technical Components", 0, "open"), 2);
 	public static Category MAGIC_ARMOR = new Category(new MenuItem(Material.GOLD_CHESTPLATE, "&7Magical Armor", 0, "open"), 2);
 	public static Category TALISMANS_1 = new Category(new MenuItem(Material.EMERALD, "&7Talismans - &aTier I", 0, "open"), 2);

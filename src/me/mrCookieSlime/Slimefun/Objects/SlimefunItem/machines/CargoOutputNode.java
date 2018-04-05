@@ -11,6 +11,7 @@ import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu.MenuClickHan
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ClickAction;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.Item.CustomItem;
 import me.mrCookieSlime.CSCoreLibPlugin.general.World.CustomSkull;
+import me.mrCookieSlime.Slimefun.Variables;
 import me.mrCookieSlime.Slimefun.Lists.RecipeType;
 import me.mrCookieSlime.Slimefun.Lists.SlimefunItems;
 import me.mrCookieSlime.Slimefun.Objects.Category;
@@ -132,6 +133,9 @@ public class CargoOutputNode extends SlimefunItem {
 			
 			@Override
 			public boolean onBreak(Player p, Block b, SlimefunItem item, UnregisterReason reason) {
+				Variables.cargoLore.remove(b.getLocation());
+				Variables.cargoDurability.remove(b.getLocation());
+				Variables.cargoFilterType.remove(b.getLocation());
 				return true;
 			}
 		});

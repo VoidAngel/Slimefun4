@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 
@@ -23,5 +24,8 @@ public class Variables {
 	public static List<UUID> blocks = new ArrayList<UUID>();
 	public static List<UUID> cancelPlace = new ArrayList<UUID>();
 	public static Map<UUID, ItemStack> arrows = new HashMap<UUID, ItemStack>();
+	public static Map<Location, Boolean> cargoLore = new HashMap<Location, Boolean>();
+	public static Map<Location, Boolean> cargoDurability = new HashMap<Location, Boolean>();
+	public static Map<Location, String> cargoFilterType = new HashMap<Location, String>();
 
 }

@@ -5,12 +5,14 @@ import java.util.List;
 
 import me.mrCookieSlime.CSCoreLibPlugin.Configuration.Config;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.Item.CustomItem;
+import me.mrCookieSlime.Slimefun.Variables;
 import me.mrCookieSlime.Slimefun.Setup.SlimefunManager;
 import me.mrCookieSlime.Slimefun.Setup.SlimefunManager.DataType;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.UniversalBlockMenu;
 
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -198,13 +200,31 @@ public class CargoManager {
 		String id = BlockStorage.checkID(block);
 		if (id.equals("CARGO_NODE_OUTPUT")) return true;
 
-		Config blockInfo = BlockStorage.getBlockInfo(block); // Store the returned Config instance to avoid heavy calls
-
-		BlockMenu menu = BlockStorage.getInventory(block.getLocation());
-		boolean lore = blockInfo.getString("filter-lore").equals("true");
-		boolean data = blockInfo.getString("filter-durability").equals("true");
+		boolean lore = false;
+		boolean data = false;
+		String filterType = "";
+		Location l = block.getLocation();
 		
-		if (blockInfo.getString("filter-type").equals("whitelist")) {
+		BlockMenu menu = BlockStorage.getInventory(block.getLocation());
+		
+		if(!(Variables.cargoLore.containsKey(l) && Variables.cargoDurability.containsKey(l) && Variables.cargoFilterType.containsKey(l)))
+		{
+			//System.out.println("USING HEAVY METHOD");
+			Config blockInfo = BlockStorage.getBlockInfo(block);
+			Variables.cargoLore.put(l, (lore = blockInfo.getString("filter-lore").equals("true")));
+			Variables.cargoDurability.put(l, (data = blockInfo.getString("filter-durability").equals("true")));
+			Variables.cargoFilterType.put(l, (filterType = blockInfo.getString("filter-type")));
+		}
+		else
+		{
+			//System.out.println("USING LIGHT METHOD");
+			lore = Variables.cargoLore.get(l);
+			data = Variables.cargoDurability.get(l);
+			filterType = Variables.cargoFilterType.get(l);
+		}
+
+
+		if (filterType.equals("whitelist")) {
 			List<ItemStack> items = new ArrayList<ItemStack>();
 			for (int slot: slots) {
 				ItemStack template = menu.getItemInSlot(slot);

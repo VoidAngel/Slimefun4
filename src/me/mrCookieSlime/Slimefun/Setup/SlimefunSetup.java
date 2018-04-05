@@ -122,6 +122,7 @@ import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.machines.AutoEnchanter;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.machines.AutomatedCraftingChamber;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.machines.AutomatedMagicWorkbench;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.machines.AutomatedVanillaCrafter;
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.machines.Barrel;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.machines.CarbonPress;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.machines.CargoInputNode;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.machines.CargoOutputNode;
@@ -5385,6 +5386,52 @@ public class SlimefunSetup {
 		new ItemStack[] {null, SlimefunItems.CARGO_MOTOR, null, SlimefunItems.COBALT_INGOT, SlimefunItems.CARGO_OUTPUT, SlimefunItems.COBALT_INGOT, null, SlimefunItems.CARGO_MOTOR, null}, new CustomItem(SlimefunItems.CARGO_OUTPUT_ADVANCED))
 		.register(true);
 
+        new Barrel(Categories.BARRELS, SlimefunItems.SMALL_BARREL, "BARREL_SMALL", RecipeType.ENHANCED_CRAFTING_TABLE, new ItemStack[]{new ItemStack(Material.WOOD_STEP), !Slimefun.askyblock ? SlimefunItems.PLASTIC_SHEET : new ItemStack(Material.CAULDRON_ITEM), new ItemStack(Material.WOOD_STEP), new ItemStack(Material.WOOD_STEP), new ItemStack(Material.CHEST), new ItemStack(Material.WOOD_STEP), new ItemStack(Material.WOOD_STEP), SlimefunItems.GILDED_IRON, new ItemStack(Material.WOOD_STEP)}, 4096) {
+
+            @Override
+            public String getInventoryTitle() {
+                return "&9Barrel &7- &eSmall";
+            }
+
+        }.register();
+
+        new Barrel(Categories.BARRELS, SlimefunItems.MEDIUM_BARREL, "BARREL_MEDIUM", RecipeType.ENHANCED_CRAFTING_TABLE, new ItemStack[]{new ItemStack(Material.WOOD_STEP), !Slimefun.askyblock ? SlimefunItems.PLASTIC_SHEET : new ItemStack(Material.CAULDRON_ITEM), new ItemStack(Material.WOOD_STEP), new ItemStack(Material.WOOD_STEP), SlimefunItems.SMALL_BARREL, new ItemStack(Material.WOOD_STEP), new ItemStack(Material.WOOD_STEP), SlimefunItems.GILDED_IRON, new ItemStack(Material.WOOD_STEP)}, 8192) {
+
+            @Override
+            public String getInventoryTitle() {
+                return "&9Barrel &7- &eMedium";
+            }
+
+        }.register();
+
+        new Barrel(Categories.BARRELS, SlimefunItems.BIG_BARREL, "BARREL_BIG", RecipeType.ENHANCED_CRAFTING_TABLE, new ItemStack[]{new ItemStack(Material.WOOD_STEP), !Slimefun.askyblock ? SlimefunItems.PLASTIC_SHEET : new ItemStack(Material.CAULDRON_ITEM), new ItemStack(Material.WOOD_STEP), new ItemStack(Material.WOOD_STEP), SlimefunItems.MEDIUM_BARREL, new ItemStack(Material.WOOD_STEP), new ItemStack(Material.WOOD_STEP), SlimefunItems.GILDED_IRON, new ItemStack(Material.WOOD_STEP)}, 16384) {
+
+            @Override
+            public String getInventoryTitle() {
+                return "&9Barrel &7- &eBig";
+            }
+
+        }.register();
+
+        new Barrel(Categories.BARRELS, SlimefunItems.LARGE_BARREL, "BARREL_LARGE", RecipeType.ENHANCED_CRAFTING_TABLE, new ItemStack[]{new ItemStack(Material.WOOD_STEP), !Slimefun.askyblock ? SlimefunItems.PLASTIC_SHEET : new ItemStack(Material.CAULDRON_ITEM), new ItemStack(Material.WOOD_STEP), new ItemStack(Material.WOOD_STEP), SlimefunItems.BIG_BARREL, new ItemStack(Material.WOOD_STEP), new ItemStack(Material.WOOD_STEP), SlimefunItems.GILDED_IRON, new ItemStack(Material.WOOD_STEP)}, 32768) {
+
+            @Override
+            public String getInventoryTitle() {
+                return "&9Barrel &7- &eLarge";
+            }
+
+        }.register();
+
+        new Barrel(Categories.BARRELS, SlimefunItems.DSU, "BARREL_GIGANTIC", RecipeType.ENHANCED_CRAFTING_TABLE, new ItemStack[]{SlimefunItems.REINFORCED_PLATE, new ItemStack(Material.ENDER_CHEST), SlimefunItems.REINFORCED_PLATE, SlimefunItems.PLASTIC_SHEET, SlimefunItems.LARGE_BARREL, SlimefunItems.PLASTIC_SHEET, SlimefunItems.REINFORCED_PLATE, SlimefunItems.BLISTERING_INGOT_3, SlimefunItems.REINFORCED_PLATE}, 1048576) {
+
+            @Override
+            public String getInventoryTitle() {
+                return "&3Deep Storage Unit";
+            }
+
+        }.register();
+		
+		
 		new SoundMuffler(Categories.ELECTRICITY, SlimefunItems.SOUND_MUFFLER, "SOUND_MUFFLER", RecipeType.ENHANCED_CRAFTING_TABLE,
 		new ItemStack[] {SlimefunItems.BATTERY, new ItemStack(Material.WOOL), new ItemStack(Material.NOTE_BLOCK), new ItemStack(Material.WOOL), SlimefunItems.POWER_CRYSTAL, new ItemStack(Material.WOOL), new ItemStack(Material.NOTE_BLOCK), new ItemStack(Material.WOOL), SlimefunItems.BATTERY}) {
 
