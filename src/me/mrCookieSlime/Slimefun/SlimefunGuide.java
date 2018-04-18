@@ -236,7 +236,7 @@ public class SlimefunGuide {
 				return false;
 			}
 		});
-		disableEmptyClicks(menu);
+		Variables.usingGuide.add(p.getUniqueId());
 		menu.open(p);
 	}
 
@@ -328,7 +328,7 @@ public class SlimefunGuide {
 				}
 			});
 		}
-		disableEmptyClicks(menu);
+		Variables.usingGuide.add(p.getUniqueId());
 		menu.open(p);
 	}
 
@@ -684,7 +684,7 @@ public class SlimefunGuide {
 					return false;
 				}
 			});
-			disableEmptyClicks(menu);
+			Variables.usingGuide.add(p.getUniqueId());
 			menu.open(p);
 		}
 	}
@@ -962,7 +962,7 @@ public class SlimefunGuide {
 					}
 				}
 			}
-			disableEmptyClicks(menu);
+			Variables.usingGuide.add(p.getUniqueId());
 			menu.open(p);			
 		}		
 		if (survival) {
@@ -1352,7 +1352,7 @@ public class SlimefunGuide {
 				}
 			}
 		}
-		disableEmptyClicks(menu);
+		Variables.usingGuide.add(p.getUniqueId());
 		menu.build().open(p);
 	}
 	
@@ -1376,20 +1376,4 @@ public class SlimefunGuide {
         timeleft = String.valueOf(timeleft) + seconds + "s";
         return "&7" + timeleft;
 	}
-	
-	public static void disableEmptyClicks(ChestMenu menu) {
-		menu.getItemInSlot(0);
-		for(int j = 0; j < menu.toInventory().getSize(); j++)
-		{
-			if(menu.getItemInSlot(j) == null || menu.getItemInSlot(j).getType() == Material.AIR) {
-				menu.addMenuClickHandler(j, new MenuClickHandler() {
-					@Override
-					public boolean onClick(Player arg0, int arg1, ItemStack arg2, ClickAction arg3) {
-						return false;
-					}
-				});
-			}
-		}
-	}
-
 }

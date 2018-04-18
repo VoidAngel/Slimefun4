@@ -20,6 +20,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -47,7 +48,6 @@ import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.Juice;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.MultiTool;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.SlimefunItem;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.Interfaces.NotPlaceable;
-import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.handlers.BlockPlaceHandler;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.handlers.ItemHandler;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.handlers.ItemInteractionHandler;
 import me.mrCookieSlime.Slimefun.Setup.Messages;
@@ -462,4 +462,18 @@ public class ItemListener implements Listener {
 			}
 		}
 	}
+	
+	@EventHandler
+	public void onClose(InventoryCloseEvent e) {
+		if (Variables.usingGuide.contains(e.getPlayer().getUniqueId())) {
+			Variables.usingGuide.remove(e.getPlayer().getUniqueId());
+		}
+	}
+	
+    @EventHandler
+    public void inventoryClickEvent(final InventoryClickEvent e) {
+        if (Variables.usingGuide.contains(e.getWhoClicked().getUniqueId())) {
+            e.setCancelled(true);
+        }
+    }
 }

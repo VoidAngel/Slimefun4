@@ -27,5 +27,7 @@ public class Variables {
 	public static Map<Location, Boolean> cargoLore = new HashMap<Location, Boolean>();
 	public static Map<Location, Boolean> cargoDurability = new HashMap<Location, Boolean>();
 	public static Map<Location, String> cargoFilterType = new HashMap<Location, String>();
-
+	public static List<UUID> usingGuide = new ArrayList<UUID>();
+	public static Map<UUID, String> dialogueCooldown = new HashMap<UUID, String>();
+	
 }
