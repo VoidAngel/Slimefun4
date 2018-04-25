@@ -143,6 +143,10 @@ public class EnergyNet extends Network {
 			for (final Location source: input) {
 				long timestamp = System.currentTimeMillis();
 				SlimefunItem item = BlockStorage.check(source);
+				if(item == null || item.getEnergyTicker() == null) {
+					EnergyHologram.update(b, "&4Invalid network component found");
+					return;
+				}
 				double energy = item.getEnergyTicker().generateEnergy(source, item, BlockStorage.getBlockInfo(source));
 
 				if (item.getEnergyTicker().explode(source)) {

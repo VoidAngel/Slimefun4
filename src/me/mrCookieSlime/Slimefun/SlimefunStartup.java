@@ -138,6 +138,7 @@ public class SlimefunStartup extends JavaPlugin {
 			System.out.println("[Slimefun] Loading Config...");
 
 			utils = new PluginUtils(this);
+			utils.setupMetrics();
 			utils.setupConfig();
 
 			// Loading all extra configs

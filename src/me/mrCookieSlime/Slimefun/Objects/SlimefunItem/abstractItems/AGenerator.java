@@ -29,6 +29,7 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -88,10 +89,18 @@ public abstract class AGenerator extends SlimefunItem {
 				BlockMenu inv = BlockStorage.getInventory(b);
 				if (inv != null) {
 					for (int slot: getInputSlots()) {
-						if (inv.getItemInSlot(slot) != null) b.getWorld().dropItemNaturally(b.getLocation(), inv.getItemInSlot(slot));
+						if (inv.getItemInSlot(slot) != null) {
+							p.sendMessage(ChatColor.RED + "You must first remove the contents before breaking!");
+							return false;
+							//b.getWorld().dropItemNaturally(b.getLocation(), inv.getItemInSlot(slot));
+						}
 					}
 					for (int slot: getOutputSlots()) {
-						if (inv.getItemInSlot(slot) != null) b.getWorld().dropItemNaturally(b.getLocation(), inv.getItemInSlot(slot));
+						if (inv.getItemInSlot(slot) != null) {
+							p.sendMessage(ChatColor.RED + "You must first remove the contents before breaking!");
+							return false;
+							//b.getWorld().dropItemNaturally(b.getLocation(), inv.getItemInSlot(slot));
+						}
 					}
 				}
 				progress.remove(b.getLocation());

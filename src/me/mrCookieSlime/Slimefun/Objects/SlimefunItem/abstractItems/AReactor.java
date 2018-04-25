@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -134,13 +135,25 @@ public abstract class AReactor extends SlimefunItem {
 				BlockMenu inv = BlockStorage.getInventory(b);
 				if (inv != null) {
 					for (int slot: getFuelSlots()) {
-						if (inv.getItemInSlot(slot) != null) b.getWorld().dropItemNaturally(b.getLocation(), inv.getItemInSlot(slot));
+						if (inv.getItemInSlot(slot) != null) {
+							p.sendMessage(ChatColor.RED + "You must first remove the contents before breaking!");
+							return false;
+							//b.getWorld().dropItemNaturally(b.getLocation(), inv.getItemInSlot(slot));
+						}
 					}
 					for (int slot: getCoolantSlots()) {
-						if (inv.getItemInSlot(slot) != null) b.getWorld().dropItemNaturally(b.getLocation(), inv.getItemInSlot(slot));
+						if (inv.getItemInSlot(slot) != null) {
+							p.sendMessage(ChatColor.RED + "You must first remove the contents before breaking!");
+							return false;
+							//b.getWorld().dropItemNaturally(b.getLocation(), inv.getItemInSlot(slot));
+						}
 					}
 					for (int slot: getOutputSlots()) {
-						if (inv.getItemInSlot(slot) != null) b.getWorld().dropItemNaturally(b.getLocation(), inv.getItemInSlot(slot));
+						if (inv.getItemInSlot(slot) != null) {
+							p.sendMessage(ChatColor.RED + "You must first remove the contents before breaking!");
+							return false;
+							//b.getWorld().dropItemNaturally(b.getLocation(), inv.getItemInSlot(slot));
+						}
 					}
 				}
 				progress.remove(b.getLocation());
