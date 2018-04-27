@@ -276,17 +276,17 @@ public class SlimefunCommand implements CommandExecutor, Listener {
 			        if (args.length == 3) {
 						if (Players.isOnline(args[1])) {
 							if (Slimefun.listIDs().contains(args[2].toUpperCase())) {
-								Messages.local.sendTranslation(Bukkit.getPlayer(args[1]), "messages.given-item", true, new Variable("%item%", SlimefunItem.getByName(args[2].toUpperCase()).getItem().getItemMeta().getDisplayName()), new Variable("%amount%", "1"));
+								Messages.local.sendTranslation(Bukkit.getPlayer(args[1]), "messages.given-item", true, new Variable("%item%", SlimefunItem.getByID(args[2].toUpperCase()).getItem().getItemMeta().getDisplayName()), new Variable("%amount%", "1"));
 								
 								HashMap<Integer, ItemStack> leftOver = new HashMap<Integer, ItemStack>();
-						        leftOver.putAll(Bukkit.getPlayer(args[1]).getInventory().addItem(SlimefunItem.getByName(args[2].toUpperCase()).getItem()));
+						        leftOver.putAll(Bukkit.getPlayer(args[1]).getInventory().addItem(SlimefunItem.getByID(args[2].toUpperCase()).getItem()));
 						        if (!leftOver.isEmpty())
 						        {
 						            Location loc = Bukkit.getPlayer(args[1]).getLocation();
 						            for (ItemStack i : leftOver.values())
 						            	Bukkit.getPlayer(args[1]).getWorld().dropItem(loc, i);
 						        }
-								Messages.local.sendTranslation(sender, "messages.give-item", true, new Variable("%player%", args[1]), new Variable("%item%", SlimefunItem.getByName(args[2].toUpperCase()).getItem().getItemMeta().getDisplayName()), new Variable("%amount%", "1"));
+								Messages.local.sendTranslation(sender, "messages.give-item", true, new Variable("%player%", args[1]), new Variable("%item%", SlimefunItem.getByID(args[2].toUpperCase()).getItem().getItemMeta().getDisplayName()), new Variable("%amount%", "1"));
 							}
 							else Messages.local.sendTranslation(sender, "messages.not-valid-item", true, new Variable("%item%", args[2]));
 						}
@@ -299,17 +299,17 @@ public class SlimefunCommand implements CommandExecutor, Listener {
                                      int amount = Integer.parseInt(args[3]);
                                      
                                      if (amount > 0) {
-                                         Messages.local.sendTranslation(Bukkit.getPlayer(args[1]), "messages.given-item", true, new Variable("%item%", SlimefunItem.getByName(args[2].toUpperCase()).getItem().getItemMeta().getDisplayName()), new Variable("%amount%", String.valueOf(amount)));
+                                         Messages.local.sendTranslation(Bukkit.getPlayer(args[1]), "messages.given-item", true, new Variable("%item%", SlimefunItem.getByID(args[2].toUpperCase()).getItem().getItemMeta().getDisplayName()), new Variable("%amount%", String.valueOf(amount)));
                                          
          								HashMap<Integer, ItemStack> leftOver = new HashMap<Integer, ItemStack>();
-        						        leftOver.putAll(Bukkit.getPlayer(args[1]).getInventory().addItem(new CustomItem(SlimefunItem.getByName(args[2].toUpperCase()).getItem(), amount)));
+        						        leftOver.putAll(Bukkit.getPlayer(args[1]).getInventory().addItem(new CustomItem(SlimefunItem.getByID(args[2].toUpperCase()).getItem(), amount)));
         						        if (!leftOver.isEmpty())
         						        {
         						            Location loc = Bukkit.getPlayer(args[1]).getLocation();
         						            for (ItemStack i : leftOver.values())
         						            	Bukkit.getPlayer(args[1]).getWorld().dropItem(loc, i);
         						        }
-                                         Messages.local.sendTranslation(sender, "messages.give-item", true, new Variable("%player%", args[1]), new Variable("%item%", SlimefunItem.getByName(args[2].toUpperCase()).getItem().getItemMeta().getDisplayName()), new Variable("%amount%", String.valueOf(amount)));
+                                         Messages.local.sendTranslation(sender, "messages.give-item", true, new Variable("%player%", args[1]), new Variable("%item%", SlimefunItem.getByID(args[2].toUpperCase()).getItem().getItemMeta().getDisplayName()), new Variable("%amount%", String.valueOf(amount)));
                                      }
                                      else Messages.local.sendTranslation(sender, "messages.not-valid-amount", true, new Variable("%amount%", String.valueOf(amount)));
                                 } catch (NumberFormatException e){
