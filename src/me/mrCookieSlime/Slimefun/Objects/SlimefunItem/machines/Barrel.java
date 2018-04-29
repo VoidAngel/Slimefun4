@@ -246,6 +246,7 @@ public abstract class Barrel extends SlimefunItem {
     	if(!BlockStorage.hasBlockInfo(b))
     	{
     		System.out.println("ERROR: " + b.getType() + " BARREL LOST BLOCK INFO AT " + b.getLocation());
+    		
     		BlockStorage.clearBlockInfo(b);
     		return;
     	}

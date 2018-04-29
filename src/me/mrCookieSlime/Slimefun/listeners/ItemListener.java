@@ -397,39 +397,6 @@ public class ItemListener implements Listener {
         }
     }
 	
-	@EventHandler(priority=EventPriority.LOWEST)
-    public void onItemPickup(PlayerPickupItemEvent e) {
-		ItemStack item = e.getItem().getItemStack();
-		
-		if(item.getType() == Material.SKULL_ITEM && item.getDurability() == 3 && item.hasItemMeta() && ((SkullMeta)item.getItemMeta()).hasOwner() && ((SkullMeta)item.getItemMeta()).getOwner().equalsIgnoreCase("cscorelib") )
-		{
-			if (!(item.getItemMeta().hasDisplayName() && (item.getItemMeta().getDisplayName().contains("Backpack") || item.getItemMeta().getDisplayName().contains("Cooler") || item.getItemMeta().getDisplayName().contains("Soul Jar"))))
-			{
-				String texture = CustomSkull.getTexture(item);
-				if(SlimefunItem.getByItem(item) == null && SlimefunItem.map_texture.containsKey(texture))
-				{
-					if(item.getAmount() != 1)
-					{
-						SlimefunItem sf = SlimefunItem.getByID(SlimefunItem.map_texture.get(texture));
-						if(sf.getID().contains("HOTBAR_PET")) return;
-						ItemStack sfItem = sf.getItem().clone();
-						sfItem.setAmount(item.getAmount());
-						e.getItem().getItemStack().setItemMeta(sfItem.getItemMeta());
-						System.out.println("Slimefun Fix > " +  sfItem.getAmount() + "x " + sf.getID() + " drop fixed for player " + e.getPlayer().getName());
-					}
-					else
-					{
-						SlimefunItem sf = SlimefunItem.getByID(SlimefunItem.map_texture.get(texture));
-						if(sf.getID().contains("HOTBAR_PET")) return;
-						ItemStack sfItem = sf.getItem().clone();
-						e.getItem().getItemStack().setItemMeta(sfItem.getItemMeta());
-						System.out.println("Slimefun Fix > " + sf.getID() + " drop fixed for player " + e.getPlayer().getName());
-					}
-				}
-			}
-		}
-	}
-	
 	@SuppressWarnings("deprecation")
 	@EventHandler(priority=EventPriority.LOWEST)
     public void onInteract(PlayerInteractEvent e) {
@@ -462,18 +429,4 @@ public class ItemListener implements Listener {
 			}
 		}
 	}
-	
-	@EventHandler
-	public void onClose(InventoryCloseEvent e) {
-		if (Variables.usingGuide.contains(e.getPlayer().getUniqueId())) {
-			Variables.usingGuide.remove(e.getPlayer().getUniqueId());
-		}
-	}
-	
-    @EventHandler
-    public void inventoryClickEvent(final InventoryClickEvent e) {
-        if (Variables.usingGuide.contains(e.getWhoClicked().getUniqueId())) {
-            e.setCancelled(true);
-        }
-    }
 }

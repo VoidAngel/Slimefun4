@@ -1166,8 +1166,16 @@ public class SlimefunSetup {
 							boolean craft = true;
 							for (int j = 0; j < inv.getContents().length; j++) {
 								if (!SlimefunManager.isItemSimiliar(inv.getContents()[j], inputs.get(i)[j], true)) {
-									craft = false;
-									break;
+									if (SlimefunItem.getByItem(inputs.get(i)[j]) instanceof SlimefunBackpack) {
+										if (!SlimefunManager.isItemSimiliar(inv.getContents()[j], inputs.get(i)[j], false)) {
+											craft = false;
+											break;
+										}
+									}
+									else {
+										craft = false;
+										break;
+									}
 								}
 							}
 
@@ -1179,6 +1187,62 @@ public class SlimefunSetup {
 										inv2.setItem(j, inv.getContents()[j] != null ? (inv.getContents()[j].getAmount() > 1 ? new CustomItem(inv.getContents()[j], inv.getContents()[j].getAmount() - 1): null): null);
 									}
 									if (InvUtils.fits(inv2, adding)) {
+										SlimefunItem sfItem = SlimefunItem.getByItem(adding);
+
+										if (sfItem instanceof SlimefunBackpack) {
+											ItemStack backpack = null;
+
+											for (int j = 0; j < 9; j++) {
+												if (inv.getContents()[j] != null) {
+													if (inv.getContents()[j].getType() != Material.AIR) {
+														if (SlimefunItem.getByItem(inv.getContents()[j]) instanceof SlimefunBackpack) {
+															backpack = inv.getContents()[j];
+															break;
+														}
+													}
+												}
+											}
+											String id = "";
+											int size = ((SlimefunBackpack) sfItem).size;
+
+											if (backpack != null) {
+												for (String line: backpack.getItemMeta().getLore()) {
+													if (line.startsWith(ChatColor.translateAlternateColorCodes('&', "&7ID: ")) && line.contains("#")) {
+														id = line.replace(ChatColor.translateAlternateColorCodes('&', "&7ID: "), "");
+														Config cfg = new Config(new File("data-storage/Slimefun/Players/" + id.split("#")[0] + ".yml"));
+														cfg.setValue("backpacks." + id.split("#")[1] + ".size", size);
+														cfg.save();
+														break;
+													}
+												}
+											}
+
+											if (id.equals("")) {
+												for (int line = 0; line < adding.getItemMeta().getLore().size(); line++) {
+													if (adding.getItemMeta().getLore().get(line).equals(ChatColor.translateAlternateColorCodes('&', "&7ID: <ID>"))) {
+														ItemMeta im = adding.getItemMeta();
+														List<String> lore = im.getLore();
+														lore.set(line, lore.get(line).replace("<ID>", Backpacks.createBackpack(p, size)));
+														im.setLore(lore);
+														adding.setItemMeta(im);
+														break;
+													}
+												}
+											}
+											else {
+												for (int line = 0; line < adding.getItemMeta().getLore().size(); line++) {
+													if (adding.getItemMeta().getLore().get(line).equals(ChatColor.translateAlternateColorCodes('&', "&7ID: <ID>"))) {
+														ItemMeta im = adding.getItemMeta();
+														List<String> lore = im.getLore();
+														lore.set(line, lore.get(line).replace("<ID>", id));
+														im.setLore(lore);
+														adding.setItemMeta(im);
+														break;
+													}
+												}
+											}
+										}
+										
 										for (int j = 0; j < 9; j++) {
 											if (inv.getContents()[j] != null) {
 												if (inv.getContents()[j].getType() != Material.AIR) {
@@ -3200,6 +3264,9 @@ public class SlimefunSetup {
 
 			@Override
 			public boolean onBreak(Player p, Block b, SlimefunItem item, UnregisterReason reason) {
+				if (Variables.altarinuse.contains(b.getLocation())) {
+					return false;
+				}
 				Item stack = AncientAltarListener.findItem(b);
 				if (stack != null) { 
 					stack.removeMetadata("item_placed", SlimefunStartup.instance);
@@ -4765,7 +4832,7 @@ public class SlimefunSetup {
 
 			@Override
 			public boolean onBreak(Player p, Block b, SlimefunItem item, UnregisterReason reason) {
-				return BlockStorage.getBlockInfo(b, "owner").equals(p.getUniqueId().toString());
+				return true;
 			}
 		});
 
@@ -4801,11 +4868,8 @@ public class SlimefunSetup {
 
 			@Override
 			public boolean onBreak(Player p, Block b, SlimefunItem item, UnregisterReason reason) {
-				if (BlockStorage.getBlockInfo(b, "owner").equals(p.getUniqueId().toString())) {
-					Projector.getArmorStand(b).remove();
-					return true;
-				}
-				else return false;
+				Projector.getArmorStand(b).remove();
+				return true;
 			}
 		});
 
