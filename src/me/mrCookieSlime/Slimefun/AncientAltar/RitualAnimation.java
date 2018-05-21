@@ -95,6 +95,7 @@ public class RitualAnimation implements Runnable {
 		running = false;
 		for (ItemStack stack: items) {
 			l.getWorld().dropItemNaturally(l, stack);
+			System.out.println("ALTAR IS ABORTING! " + stack.getAmount() + " " + stack.getType() + " being dropped at " + l.getX() + " " + l.getY() + " " + l.getZ());
 		}
 		l.getWorld().playSound(l, Sound.BLOCK_NOTE_SNARE, 5F, 1F);
 
@@ -104,7 +105,8 @@ public class RitualAnimation implements Runnable {
 	private void finish() {
 		l.getWorld().playSound(l, Sound.ENTITY_ZOMBIE_VILLAGER_CURE, 1F, 1F);
 		l.getWorld().playEffect(l, Effect.STEP_SOUND, Material.EMERALD_BLOCK);
-		l.getWorld().dropItemNaturally(l.add(0, 1, 0), output);
+		if(running)
+			l.getWorld().dropItemNaturally(l.add(0, 1, 0), output);
 
 		pedestals.forEach((pblock)->{
 			Variables.altarinuse.remove(pblock.getLocation());

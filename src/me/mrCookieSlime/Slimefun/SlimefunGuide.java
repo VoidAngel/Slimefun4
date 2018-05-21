@@ -442,7 +442,7 @@ public class SlimefunGuide {
 						tooltips.add(null);
 						actions.add(null);
 					}
-					if (category instanceof LockedCategory && !((LockedCategory) category).hasUnlocked(p)) {
+					if (category instanceof LockedCategory && !((LockedCategory) category).hasUnlocked(p) && survival) {
 						StringBuilder parents = new StringBuilder("&4&lLOCKED\n\n&7In order to unlock this Category,\n&7you need to unlock all Items from\n&7the following Categories first:\n");
 						
 						for (Category parent: ((LockedCategory) category).getParents()) {
@@ -600,7 +600,7 @@ public class SlimefunGuide {
 					if (locked) {
 						// Dont display that Category...
 					}
-					else if (!(category instanceof LockedCategory)) {
+					else if (!(category instanceof LockedCategory) || !survival) {
 						if (!(category instanceof SeasonCategory)) {
 							menu.addItem(index, category.getItem());
 							menu.addMenuClickHandler(index, new MenuClickHandler() {
@@ -628,7 +628,7 @@ public class SlimefunGuide {
 							}
 						}
 					}
-					else if (((LockedCategory) category).hasUnlocked(p)) {
+					else if (((LockedCategory) category).hasUnlocked(p) || !survival) {
 						menu.addItem(index, category.getItem());
 						menu.addMenuClickHandler(index, new MenuClickHandler() {
 							

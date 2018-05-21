@@ -19,17 +19,32 @@ import me.mrCookieSlime.Slimefun.Setup.Messages;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockDispenseEvent;
+import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
+import org.bukkit.event.entity.EntityCombustEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -47,7 +62,7 @@ public class AncientAltarListener implements Listener {
 
 	@EventHandler(priority=EventPriority.HIGH, ignoreCancelled = true)
 	public void onInteract(PlayerInteractEvent e) {
-		if (e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+		if (e.getAction() != Action.RIGHT_CLICK_BLOCK) return; 
 		Block b = e.getClickedBlock();
 		
 		SlimefunItem item = BlockStorage.check(b);
@@ -55,7 +70,7 @@ public class AncientAltarListener implements Listener {
 		if (item != null) {
 			if (item.getID().equals("ANCIENT_PEDESTAL")) {
 				
-				if (Variables.altarinuse.contains(b.getLocation())) {
+				if (Variables.altarinuse.contains(b.getLocation()) || e.getPlayer().isSneaking()) {
 					e.setCancelled(true);
 					return;
 				}
@@ -188,7 +203,7 @@ public class AncientAltarListener implements Listener {
 		}
 	}
 
-	@EventHandler (priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	@EventHandler (priority = EventPriority.LOWEST)
 	public void onBlockPlace(BlockPlaceEvent e) {
 		Block b = e.getBlockPlaced().getRelative(0, -1, 0);
 		SlimefunItem item = BlockStorage.check(b);
@@ -198,4 +213,100 @@ public class AncientAltarListener implements Listener {
 			e.setCancelled(true);
 		}
 	}
+	
+	@EventHandler //Blocks dispensing anything that could move or destroy the probe
+	public void dispenseEvent(BlockDispenseEvent e){
+		ItemStack item = e.getItem();
+		if(item != null) {
+			if(item.getType() == Material.WATER_BUCKET
+			|| item.getType() == Material.LAVA_BUCKET
+			|| item.getType() == Material.FLINT_AND_STEEL) {
+				BlockFace face = ((org.bukkit.material.Dispenser) e.getBlock().getState().getData()).getFacing();
+				Block pedestal = e.getBlock().getRelative(face).getRelative(BlockFace.DOWN);
+				SlimefunItem sfItem = BlockStorage.check(pedestal);
+				if (sfItem != null && sfItem.getID().equals("ANCIENT_PEDESTAL")) e.setCancelled(true);
+			}
+		}
+	}
+	
+	@EventHandler //Blocks players placing water to move the probe
+	public void onLiquidPlace(PlayerBucketEmptyEvent e) {
+		Block block = e.getBlockClicked().getRelative(e.getBlockFace());
+		SlimefunItem sfItem = BlockStorage.check(block.getRelative(BlockFace.DOWN));
+		if (sfItem != null && sfItem.getID().equals("ANCIENT_PEDESTAL")) e.setCancelled(true);
+	}
+	
+	@EventHandler //Blocks water from flowing into the probe
+	public void onLiquidFlow(BlockFromToEvent e) {
+		Block block = e.getToBlock();
+		SlimefunItem sfItem = BlockStorage.check(block.getRelative(BlockFace.DOWN));
+		if (sfItem != null && sfItem.getID().equals("ANCIENT_PEDESTAL")) e.setCancelled(true);
+	}
+	
+	@EventHandler //Blocks sand or other falling entities from displacing the probe
+	public void onBlockFall(EntityChangeBlockEvent event) {
+		if (event.getEntity() instanceof FallingBlock) {
+			SlimefunItem sfItem = BlockStorage.check(event.getBlock().getRelative(BlockFace.DOWN));
+			if (sfItem != null && sfItem.getID().equals("ANCIENT_PEDESTAL")) {
+				event.setCancelled(true);
+				FallingBlock fb = (FallingBlock) event.getEntity();
+				if (fb.getDropItem()) {
+					fb.getWorld().dropItemNaturally(fb.getLocation(), new ItemStack(fb.getMaterial(), 1, fb.getMaterial() == Material.ANVIL ? 0 : fb.getBlockData()));
+				}
+			}
+		}
+	}
+
+	@EventHandler //Blocks pistons from displacing the probe
+	public void onPistonExtend(BlockPistonExtendEvent e) {
+		if(e.getBlocks().isEmpty()) {
+			SlimefunItem sfItem = BlockStorage.check(e.getBlock().getRelative(BlockFace.DOWN).getRelative(e.getDirection()));
+			if (sfItem != null && sfItem.getID().equals("ANCIENT_PEDESTAL")) {
+				e.setCancelled(true);
+				return;
+			}
+		}
+		for (Block b : e.getBlocks()) {
+			Block pedestal2 = b.getRelative(BlockFace.DOWN).getRelative(e.getDirection());
+			SlimefunItem sfItem2 = BlockStorage.check(pedestal2);
+			if (sfItem2 != null && sfItem2.getID().equals("ANCIENT_PEDESTAL")) {
+				e.setCancelled(true);
+				return;
+			}
+		}
+	}
+	
+	@EventHandler //Blocks pistons from displacing the probe
+	public void onPistonRetract(BlockPistonRetractEvent e) {
+		if (e.isSticky()) {
+			for (Block b : e.getBlocks()) {
+				Block pedestal = b.getRelative(BlockFace.DOWN).getRelative(e.getDirection());
+				SlimefunItem sfItem = BlockStorage.check(pedestal);
+				if (sfItem != null && sfItem.getID().equals("ANCIENT_PEDESTAL")) {
+					e.setCancelled(true);
+					return;
+				}
+			}
+		}
+	}
+	
+    @EventHandler //Blocks explosions from destroying the probe
+    public void onItemDestroy(final EntityDamageByEntityEvent event) {
+        if (event.getEntity() instanceof Item) {
+		    Item item = (Item) event.getEntity();
+		    if(item.getItemStack().hasItemMeta() && item.getItemStack().getItemMeta().hasDisplayName() && item.getItemStack().getItemMeta().getDisplayName().startsWith(ChatColor.translateAlternateColorCodes('&', "&5&dALTAR &3Probe - &e"))) {
+		        event.setCancelled(true);
+		    }
+        }
+    }
+    
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onItemBurn(EntityCombustEvent e) {
+        if (e.getEntityType() == EntityType.DROPPED_ITEM) {
+        	Item item = (Item)e.getEntity();
+        	if(item.getItemStack().hasItemMeta() && item.getItemStack().getItemMeta().hasDisplayName() && item.getItemStack().getItemMeta().getDisplayName().startsWith(ChatColor.translateAlternateColorCodes('&', "&5&dALTAR &3Probe - &e"))) {
+        		e.setCancelled(true);
+        	}
+        }
+    }
 }

@@ -422,12 +422,13 @@ public class ItemListener implements Listener {
 										SlimefunItem.blockhandler.get(sfItem.getID()).onPlace(e.getPlayer(), b, sfItem);
 									}
 									System.out.println("Slimefun Fix > " + sfItem.getID() + " block fixed for player " + e.getPlayer().getName());
+									return;
 								}
 							}
 			            }
 			        }
 				}
-				else if(b.getType() == Material.SKULL) {
+				if(b.getType() == Material.SKULL) {
 					Skull skull = (Skull) b.getState();
 					if(skull.hasOwner() && skull.getOwner().equalsIgnoreCase("cscorelib")) {
 						String texture = "";

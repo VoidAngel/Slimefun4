@@ -40,12 +40,19 @@ public class BowListener implements Listener {
 			public void run() {
 				if (!e.getEntity().isValid()) return;
 				if (Variables.arrows.containsKey(e.getEntity().getUniqueId())) Variables.arrows.remove(e.getEntity().getUniqueId());
-				if (e.getEntity() instanceof Arrow) handleGrapplingHook((Arrow) e.getEntity());
+				if (e.getEntity() instanceof Arrow && e.getEntity().getShooter() instanceof Player) {
+					Arrow arrow = ((Arrow)e.getEntity());
+					if(Variables.remove.containsKey(((Player)arrow.getShooter()).getUniqueId())) {
+						if(!arrow.isDead() && Variables.remove.get(((Player)arrow.getShooter()).getUniqueId())[1].getUniqueId().equals(arrow.getUniqueId())) {
+							handleGrapplingHook(arrow);
+						}
+					}
+				}
 			}
 		}, 4L);
 	}
 	
-	private void handleGrapplingHook(Arrow arrow) {
+	public static void handleGrapplingHook(Arrow arrow) {
 		if (arrow instanceof Arrow) {
 			if (arrow.getShooter() instanceof Player && Variables.jump.containsKey(((Player) arrow.getShooter()).getUniqueId())) {
 				final Player p = (Player) arrow.getShooter();
@@ -115,7 +122,14 @@ public class BowListener implements Listener {
 				 Variables.arrows.remove(e.getDamager().getUniqueId());
 			}
 			
-			handleGrapplingHook((Arrow) e.getDamager());
+			if (e.getDamager() instanceof Arrow && ((Arrow)e.getDamager()).getShooter() instanceof Player) {
+				Arrow arrow = (Arrow) e.getDamager();
+				if(Variables.remove.containsKey(((Player)arrow.getShooter()).getUniqueId())) {
+					if(!arrow.isDead() && Variables.remove.get(((Player)arrow.getShooter()).getUniqueId())[1].getUniqueId().equals(arrow.getUniqueId())) {
+						handleGrapplingHook(arrow);
+					}
+				}
+			}
 		}
 	}
 

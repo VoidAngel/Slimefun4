@@ -162,6 +162,7 @@ import me.mrCookieSlime.Slimefun.holograms.InfusedHopper;
 import me.mrCookieSlime.Slimefun.holograms.Projector;
 import me.mrCookieSlime.Slimefun.holograms.ReactorHologram;
 import me.mrCookieSlime.Slimefun.listeners.AncientAltarListener;
+import me.mrCookieSlime.Slimefun.listeners.BowListener;
 
 @SuppressWarnings("deprecation")
 public class SlimefunSetup {
@@ -1117,8 +1118,8 @@ public class SlimefunSetup {
 			public boolean onRightClick(ItemUseEvent e, Player p, ItemStack item) {
 				if (SlimefunManager.isItemSimiliar(item, SlimefunItems.GRAPPLING_HOOK, true)) {
 					if (e.getClickedBlock() == null && !Variables.jump.containsKey(p.getUniqueId())) {
-						Variables.jump.put(p.getUniqueId(), p.getItemInHand().getType() != Material.SHEARS);
 						e.setCancelled(true);
+						Variables.jump.put(p.getUniqueId(), p.getItemInHand().getType() != Material.SHEARS);
 						if (p.getItemInHand().getType() == Material.LEASH) PlayerInventory.consumeItemInHand(p);
 
 						Vector direction = p.getEyeLocation().getDirection().multiply(2.0);
@@ -1133,6 +1134,18 @@ public class SlimefunSetup {
 
 				    	Variables.damage.put(p.getUniqueId(), true);
 						Variables.remove.put(p.getUniqueId(), new Entity[] {b, arrow});
+						
+			    	    Bukkit.getScheduler().scheduleSyncDelayedTask(SlimefunStartup.instance, new Runnable() {
+							
+							@Override
+							public void run() {
+								if(Variables.remove.containsKey(p.getUniqueId())) {
+									if(!arrow.isDead() && Variables.remove.get(p.getUniqueId())[1].getUniqueId().equals(arrow.getUniqueId())) {
+										BowListener.handleGrapplingHook(arrow);
+									}
+								}
+							}
+						}, 100L);
 					}
 					return true;
 				}
@@ -1180,7 +1193,7 @@ public class SlimefunSetup {
 							}
 
 							if (craft) {
-								final ItemStack adding = RecipeType.getRecipeOutputList(machine, inputs.get(i));
+								final ItemStack adding = RecipeType.getRecipeOutputList(machine, inputs.get(i)).clone();
 								if (Slimefun.hasUnlocked(p, adding, true)) {
 									Inventory inv2 = Bukkit.createInventory(null, 9, "test");
 									for (int j = 0; j < inv.getContents().length; j++) {
@@ -3273,7 +3286,8 @@ public class SlimefunSetup {
 
 			@Override
 			public boolean onBreak(Player p, Block b, SlimefunItem item, UnregisterReason reason) {
-				if (Variables.altarinuse.contains(b.getLocation())) {
+				if (Variables.altarinuse.contains(b.getLocation()) || (BlockStorage.check(b).getID().equals("ANCIENT_PEDESTAL") && AncientAltarListener.findItem(b) != null)) {
+					p.sendMessage(ChatColor.RED + "You cannot break pedestals while they are in use!");
 					return false;
 				}
 				Item stack = AncientAltarListener.findItem(b);
@@ -4900,9 +4914,11 @@ public class SlimefunSetup {
 				boolean sound = false;
 				for (Entity n: hologram.getNearbyEntities(3.5D, 3.5D, 3.5D)) {
 					if (n instanceof Item && !n.hasMetadata("no_pickup") && n.getLocation().distance(hologram.getLocation()) > 0.4D) {
-						n.setVelocity(new Vector(0, 0.1, 0));
-						n.teleport(hologram);
-						sound = true;
+						if(!n.hasMetadata("drop_party")) {
+							n.setVelocity(new Vector(0, 0.1, 0));
+							n.teleport(hologram);
+							sound = true;
+						}
 					}
 				}
 				if (sound) b.getWorld().playSound(b.getLocation(), Sound.ENTITY_ENDERMEN_TELEPORT, 5F, 2F);
