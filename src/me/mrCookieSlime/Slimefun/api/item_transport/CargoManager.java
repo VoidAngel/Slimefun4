@@ -204,13 +204,12 @@ public class CargoManager {
 		boolean data = false;
 		String filterType = "";
 		Location l = block.getLocation();
-		
 		BlockMenu menu = BlockStorage.getInventory(block.getLocation());
 		
 		if(!(Variables.cargoLore.containsKey(l) && Variables.cargoDurability.containsKey(l) && Variables.cargoFilterType.containsKey(l)))
 		{
 			//System.out.println("USING HEAVY METHOD");
-			Config blockInfo = BlockStorage.getBlockInfo(block);
+			Config blockInfo = BlockStorage.getLocationInfo(block.getLocation()); 
 			Variables.cargoLore.put(l, (lore = blockInfo.getString("filter-lore").equals("true")));
 			Variables.cargoDurability.put(l, (data = blockInfo.getString("filter-durability").equals("true")));
 			Variables.cargoFilterType.put(l, (filterType = blockInfo.getString("filter-type")));

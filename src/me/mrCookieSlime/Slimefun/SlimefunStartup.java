@@ -35,6 +35,7 @@ import me.mrCookieSlime.Slimefun.GitHub.GitHubConnector;
 import me.mrCookieSlime.Slimefun.GitHub.GitHubSetup;
 import me.mrCookieSlime.Slimefun.Hashing.ItemHash;
 import me.mrCookieSlime.Slimefun.Lists.SlimefunItems;
+import me.mrCookieSlime.Slimefun.Misc.BookDesign;
 import me.mrCookieSlime.Slimefun.Objects.MultiBlock;
 import me.mrCookieSlime.Slimefun.Objects.Research;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.SlimefunArmorPiece;
@@ -230,7 +231,9 @@ public class SlimefunStartup extends JavaPlugin {
 							Player p = e.getPlayer();
 							if (!getWhitelist().getBoolean(p.getWorld().getName() + ".enabled")) return;
 							if (!getWhitelist().getBoolean(p.getWorld().getName() + ".enabled-items.SLIMEFUN_GUIDE")) return;
-							p.getInventory().addItem(SlimefunGuide.getItem(config.getBoolean("guide.default-view-book")));
+							
+							if (config.getBoolean("guide.default-view-book")) p.getInventory().addItem(SlimefunGuide.getItem(BookDesign.BOOK));
+							else p.getInventory().addItem(SlimefunGuide.getItem(BookDesign.CHEST));
 						}
 					}
 
@@ -293,7 +296,7 @@ public class SlimefunStartup extends JavaPlugin {
 					Class.forName("com.sk89q.worldedit.extent.Extent");
 					new WESlimefunManager();
 					System.out.println("[Slimefun] Successfully hooked into WorldEdit!");
-				} catch(Exception x) {
+				} catch (Exception x) {
 					System.err.println("[Slimefun] Failed to hook into WorldEdit!");
 					System.err.println("[Slimefun] Maybe consider updating WorldEdit or Slimefun?");
 				}
@@ -392,7 +395,7 @@ public class SlimefunStartup extends JavaPlugin {
             Bukkit.getScheduler().scheduleSyncDelayedTask(this, new BukkitRunnable() {
                 @Override
                 public void run() {
-                    exoticGarden = getServer().getPluginManager().isPluginEnabled("ExoticGarden"); //Had to do it this way, otherwise it seems disabled.
+                    exoticGarden = getServer().getPluginManager().isPluginEnabled("ExoticGarden"); // Had to do it this way, otherwise it seems disabled.
                 }
             }, 0);
 
@@ -431,9 +434,8 @@ public class SlimefunStartup extends JavaPlugin {
 				}
 			}
 
-			//SlimefunBackup.start();
-		} catch(Exception x) {
-		}
+			SlimefunBackup.start();
+		} catch (Exception x) {}
 
 		// Prevent Memory Leaks
 		config = null;
