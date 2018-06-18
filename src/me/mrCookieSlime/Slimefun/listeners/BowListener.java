@@ -88,11 +88,23 @@ public class BowListener implements Listener {
 		    	    double v_z = (1.0D + 0.08000000000000001D * t) * (arrow.getLocation().getZ() - l.getZ()) / t;
 
 		    	    Vector v = p.getVelocity();
-		    	    
 		    	    v.setX(v_x);
 		    	    v.setY(v_y);
 		    	    v.setZ(v_z);
-		    	    
+
+		            if(v.getX() > 4)
+		            	v.setX(4.0);
+		            else if(v.getX() < -4)
+		            	v.setX(-4.0);
+		            if(v.getY() > 4)
+		            	v.setY(4.0);
+		            else if(v.getY() < -4)
+		            	v.setY(-4.0);
+		            if(v.getZ() > 4)
+		            	v.setZ(4.0);
+		            else if(v.getZ() < -4)
+		            	v.setZ(-4.0);
+
 		    	    p.setVelocity(v);
 		    	    
 		    	    for (Entity n: Variables.remove.get(p.getUniqueId())) {

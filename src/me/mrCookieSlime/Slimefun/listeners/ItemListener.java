@@ -153,6 +153,8 @@ public class ItemListener implements Listener {
 						p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6" + BlockStorage.getBlockInfoAsJson(e.getClickedBlock())));
 						p.sendMessage(" ");
 					}
+					else
+						p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cNo block data found."));
 					break;
 				}
 				default:
@@ -437,7 +439,8 @@ public class ItemListener implements Listener {
 						} catch (Exception e1) {
 							e1.printStackTrace();
 						}
-						if(!BlockStorage.hasBlockInfo(b) && SlimefunItem.map_texture.containsKey(texture)) {
+						boolean hasInfo = BlockStorage.hasBlockInfo(b);
+						if(!hasInfo && SlimefunItem.map_texture.containsKey(texture)) {
 							SlimefunItem sfItem = SlimefunItem.getByID(SlimefunItem.map_texture.get(texture));
 							if (sfItem != null && !(sfItem instanceof NotPlaceable)){
 								BlockStorage.addBlockInfo(b, "id", sfItem.getID(), true);
@@ -445,6 +448,20 @@ public class ItemListener implements Listener {
 									SlimefunItem.blockhandler.get(sfItem.getID()).onPlace(e.getPlayer(), b, sfItem);
 								}
 								System.out.println("Slimefun Fix > " + sfItem.getID() + " block fixed for player " + e.getPlayer().getName());	
+							}
+						} else if (hasInfo && texture.isEmpty()) {
+							String sfItem = BlockStorage.checkID(b.getLocation());
+							if(sfItem != null) {
+								for(String textures:SlimefunItem.map_texture.keySet()) {
+									if(SlimefunItem.map_texture.get(textures).equalsIgnoreCase(sfItem)) {
+										System.out.println("Slimefun Fix > " + sfItem + " WITH STEVE SKIN FIXED AT " + b.getLocation());
+										try {
+											CustomSkull.setSkull(b, textures);
+										} catch (Exception e1) {
+											e1.printStackTrace();
+										}
+									}
+								}
 							}
 						}
 					}

@@ -127,9 +127,9 @@ public class EnergyNet extends Network {
 		}
 	}
 
-	public void tick(Block b) {
-		if(!regulator.equals(b.getLocation())) {
-			EnergyHologram.update(b, "&4Multiple Energy Regulators connected");
+	public void tick(Location l) {
+		if(!regulator.equals(l)) {
+			EnergyHologram.update(l, "&4Multiple Energy Regulators connected");
 			return;
 		}
 		super.tick();
@@ -137,14 +137,14 @@ public class EnergyNet extends Network {
 		double demand = 0.0D;
 
 		if (connectorNodes.isEmpty() && terminusNodes.isEmpty()) {
-			EnergyHologram.update(b, "&4No Energy Network found");
+			EnergyHologram.update(l, "&4No Energy Network found");
 		}
 		else {
 			for (final Location source: input) {
 				long timestamp = System.currentTimeMillis();
 				SlimefunItem item = BlockStorage.check(source);
 				if(item == null || item.getEnergyTicker() == null) {
-					EnergyHologram.update(b, "&4Invalid network component found");
+					EnergyHologram.update(l, "&4Invalid network component found");
 					return;
 				}
 				double energy = item.getEnergyTicker().generateEnergy(source, item, BlockStorage.getBlockInfo(source));
@@ -225,7 +225,7 @@ public class EnergyNet extends Network {
 				}
 			}
 
-			EnergyHologram.update(b, supply, demand);
+			EnergyHologram.update(l, supply, demand);
 		}
 	}
 }

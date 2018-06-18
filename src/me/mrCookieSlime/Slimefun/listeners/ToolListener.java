@@ -11,6 +11,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.Dispenser;
 import org.bukkit.block.Furnace;
 import org.bukkit.block.Hopper;
+import org.bukkit.block.Skull;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
@@ -23,11 +24,14 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.onikur.changebackitem.ChangeBackItem;
+
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.Item.CustomItem;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.Item.SkullItem;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Particles.FireworkShow;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Player.PlayerInventory;
 import me.mrCookieSlime.CSCoreLibPlugin.general.String.StringUtils;
+import me.mrCookieSlime.CSCoreLibPlugin.general.World.CustomSkull;
 import me.mrCookieSlime.Slimefun.SlimefunStartup;
 import me.mrCookieSlime.Slimefun.Variables;
 import me.mrCookieSlime.Slimefun.Lists.SlimefunItems;
@@ -235,55 +239,26 @@ public class ToolListener implements Listener {
 		}
 		else if (sfItem == null)
 		{
-			if(e.getBlock().getType() == Material.FURNACE || e.getBlock().getType() == Material.BURNING_FURNACE)
-			{
-				Furnace broken = (Furnace) e.getBlock().getState();
-				String msg = null;
-
-				switch(broken.getInventory().getTitle())
-				{
-				case "§cElectric Furnace": drops.add(SlimefunItems.ELECTRIC_FURNACE); msg = "SF Fix > Broken " + broken.getInventory().getTitle() + " block recovered for " + e.getPlayer().getName(); break;
-				case "§cElectric Furnace §7- §eII": drops.add(SlimefunItems.ELECTRIC_FURNACE_2); msg = "SF Fix > Broken " + broken.getInventory().getTitle() + " block recovered for " + e.getPlayer().getName(); break;
-				case "§cElectric Furnace §7- §eIII": drops.add(SlimefunItems.ELECTRIC_FURNACE_3); msg = "SF Fix > Broken " + broken.getInventory().getTitle() + " block recovered for " + e.getPlayer().getName(); break;
-				case "§cElectric Ore Grinder": drops.add(SlimefunItems.ELECTRIC_ORE_GRINDER); msg = "SF Fix > Broken " + broken.getInventory().getTitle() + " block recovered for " + e.getPlayer().getName(); break;
-				case "§cElectric Ore Grinder §7(§eII§7)": drops.add(SlimefunItems.ELECTRIC_ORE_GRINDER_2); msg = "SF Fix > Broken " + broken.getInventory().getTitle() + " block recovered for " + e.getPlayer().getName(); break;
-				case "§cElectric Ingot Pulverizer": drops.add(SlimefunItems.ELECTRIC_INGOT_PULVERIZER); msg = "SF Fix > Broken " + broken.getInventory().getTitle() + " block recovered for " + e.getPlayer().getName(); break;
-				case "§cElectric Smeltery": drops.add(SlimefunItems.ELECTRIC_SMELTERY); msg = "SF Fix > Broken " + broken.getInventory().getTitle() + " block recovered for " + e.getPlayer().getName(); break;
-				case "§cElectric Smeltery §7- §eII": drops.add(SlimefunItems.ELECTRIC_SMELTERY_2); msg = "SF Fix > Broken " + broken.getInventory().getTitle() + " block recovered for " + e.getPlayer().getName(); break;
+			Block b = e.getBlock();
+			if(!(ChangeBackItem.get().isValidBlockForRestoreItem(b) && b.hasMetadata("ChangeBackItem"))) {
+				if(b.getType() == Material.SKULL) {
+					Skull skull = (Skull) b.getState();
+					if(skull.hasOwner() && skull.getOwningPlayer().getName().equalsIgnoreCase("cscorelib")) {
+						String texture = "";
+						try {
+							texture = CustomSkull.getTexture(b);
+						} catch (Exception e1) {
+							e1.printStackTrace();
+						}
+						if(!BlockStorage.hasBlockInfo(b) && SlimefunItem.map_texture.containsKey(texture)) {
+							SlimefunItem sfItem2 = SlimefunItem.getByID(SlimefunItem.map_texture.get(texture));
+							if (sfItem2 != null && !(sfItem2 instanceof NotPlaceable)){
+								drops.add(sfItem2.getItem());
+								System.out.println("Slimefun Fix Break > " + sfItem2.getID() + " block fixed for player " + e.getPlayer().getName());	
+							}
+						}
+					}
 				}
-				
-				if (msg != null)
-				{
-					System.out.println(msg);
-				}
-			}
-			else if(e.getBlock().getType() == Material.DISPENSER)
-			{
-				Dispenser broken = (Dispenser) e.getBlock().getState();
-				String msg = null;
-
-				switch(broken.getInventory().getTitle())
-				{
-				case "§7Android Interface §c(Fuel)": drops.add(SlimefunItems.ANDROID_INTERFACE_FUEL); msg = "SF Fix > Broken " + broken.getInventory().getTitle() + " block recovered for " + e.getPlayer().getName(); break;
-				case "§7Android Interface §9(Items)": drops.add(SlimefunItems.ANDROID_INTERFACE_ITEMS); msg = "SF Fix > Broken " + broken.getInventory().getTitle() + " block recovered for " + e.getPlayer().getName(); break;
-				case "§dAncient Pedestal": drops.add(SlimefunItems.ANCIENT_PEDESTAL); msg = "SF Fix > Broken " + broken.getInventory().getTitle() + " block recovered for " + e.getPlayer().getName(); break;
-				}
-				
-				if (msg != null)
-					System.out.println(msg);
-			}
-			else if(e.getBlock().getType() == Material.HOPPER)
-			{
-				Hopper broken = (Hopper) e.getBlock().getState();
-				String msg = null;
-
-				switch(broken.getInventory().getTitle())
-				{
-				case "§5Infused Hopper": drops.add(SlimefunItems.ANCIENT_ALTAR); msg = "SF Fix > Broken " + broken.getInventory().getTitle() + " block recovered for " + e.getPlayer().getName(); break;
-				}
-				
-				if (msg != null)
-					System.out.println(msg);
 			}
 		}
 		
