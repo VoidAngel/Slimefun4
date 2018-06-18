@@ -1,6 +1,7 @@
 package me.mrCookieSlime.Slimefun.AncientAltar;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import me.mrCookieSlime.CSCoreLibPlugin.general.Particles.MC_1_8.ParticleEffect;

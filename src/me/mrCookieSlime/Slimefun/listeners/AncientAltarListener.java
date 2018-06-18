@@ -17,6 +17,7 @@ import me.mrCookieSlime.Slimefun.AncientAltar.RitualAnimation;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.SlimefunItem;
 import me.mrCookieSlime.Slimefun.Setup.Messages;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
+import me.mrCookieSlime.Slimefun.Variables;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -74,7 +75,6 @@ public class AncientAltarListener implements Listener {
 					e.setCancelled(true);
 					return;
 				}
-				
 				e.setCancelled(true);
 				Item stack = findItem(b);
 				if (stack == null) {
