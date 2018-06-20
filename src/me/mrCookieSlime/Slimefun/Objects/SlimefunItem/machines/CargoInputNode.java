@@ -233,11 +233,11 @@ public class CargoInputNode extends SlimefunItem {
 			@Override
 			public void onPlace(Player p, Block b, SlimefunItem item) {
 				BlockStorage.addBlockInfo(b, "owner", p.getUniqueId().toString());
-				if(BlockStorage.getBlockInfo(b, "index") == null)
+				if(BlockStorage.getLocationInfo(b.getLocation(), "index") == null)
 					BlockStorage.addBlockInfo(b, "index", "0");
-				if(BlockStorage.getBlockInfo(b, "frequency") == null)
+				if(BlockStorage.getLocationInfo(b.getLocation(), "frequency") == null)
 					BlockStorage.addBlockInfo(b, "frequency", "0");
-				if(BlockStorage.getBlockInfo(b, "whitelist") == null)
+				if(BlockStorage.getLocationInfo(b.getLocation(), "whitelist") == null)
 					BlockStorage.addBlockInfo(b, "filter-type", "whitelist");
 				BlockStorage.addBlockInfo(b, "filter-lore", "true");
 				BlockStorage.addBlockInfo(b, "filter-durability", "false");

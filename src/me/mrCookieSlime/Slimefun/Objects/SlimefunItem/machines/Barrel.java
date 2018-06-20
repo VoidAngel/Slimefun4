@@ -64,7 +64,7 @@ public abstract class Barrel extends SlimefunItem {
 					
 				});
 
-				if (BlockStorage.getBlockInfo(b, "storedItems") == null) {
+				if (BlockStorage.getLocationInfo(b.getLocation(), "storedItems") == null) {
 					menu.replaceExistingItem(4, new CustomItem(new ItemStack(Material.BARRIER), "&7Empty"), false);
 					menu.replaceExistingItem(22, new CustomItem(new ItemStack(Material.BARRIER), "&7Empty"), false);
 				}
@@ -84,7 +84,7 @@ public abstract class Barrel extends SlimefunItem {
             @Override
             public int[] getSlotsAccessedByItemTransport(BlockMenu menu, ItemTransportFlow flow, ItemStack item) {
                 if (flow == ItemTransportFlow.INSERT) {
-                    if (BlockStorage.getBlockInfo(menu.getBlock(), "storedItems") != null)
+                    if (BlockStorage.getLocationInfo(menu.getBlock().getLocation(), "storedItems") != null)
                         return isSimiliar(item, menu.getItemInSlot(22)) ? getInputSlots() : new int[0];
                     else return getInputSlots();
                 } else return getOutputSlots();
@@ -102,10 +102,10 @@ public abstract class Barrel extends SlimefunItem {
             @Override
             public boolean onBreak(Player player, Block block, SlimefunItem slimefunItem, UnregisterReason unregisterReason) {
                 if (unregisterReason.equals(UnregisterReason.EXPLODE)) {
-                    if (BlockStorage.getBlockInfo(block, "explosion") != null) return false;
+                    if (BlockStorage.getLocationInfo(block.getLocation(), "explosion") != null) return false;
                 } else if (unregisterReason.equals(UnregisterReason.PLAYER_BREAK)) {
                 	if(!CSCoreLib.getLib().getProtectionManager().canBuild(player.getUniqueId(), block, true)) return false;
-                    if (BlockStorage.getBlockInfo(block, "storedItems") != null && Integer.valueOf(BlockStorage.getBlockInfo(block, "storedItems")) > 1000){
+                    if (BlockStorage.getLocationInfo(block.getLocation(), "storedItems") != null && Integer.valueOf(BlockStorage.getLocationInfo(block.getLocation(), "storedItems")) > 1000){
                     	player.sendMessage("§cThis barrel has too many items in it! Please empty it before breaking.");
                     	return false;
                     }
@@ -113,8 +113,8 @@ public abstract class Barrel extends SlimefunItem {
 
                 BlockMenu inv = BlockStorage.getInventory(block);
 
-                if (BlockStorage.getBlockInfo(block, "storedItems") == null) return true;
-                int storedAmount = Integer.valueOf(BlockStorage.getBlockInfo(block, "storedItems"));
+                if (BlockStorage.getLocationInfo(block.getLocation(), "storedItems") == null) return true;
+                int storedAmount = Integer.valueOf(BlockStorage.getLocationInfo(block.getLocation(), "storedItems"));
 
                 ItemStack item = inv.getItemInSlot(22);
                 ItemMeta meta = item.getItemMeta();
@@ -181,11 +181,11 @@ public abstract class Barrel extends SlimefunItem {
     }
 
     public int getCapacity(Block b) {
-        if (BlockStorage.getBlockInfo(b, "capacity") == null) {
+        if (BlockStorage.getLocationInfo(b.getLocation(), "capacity") == null) {
             BlockStorage.addBlockInfo(b, "capacity", String.valueOf(this.capacity));
         }
 
-        return Integer.valueOf(BlockStorage.getBlockInfo(b, "capacity"));
+        return Integer.valueOf(BlockStorage.getLocationInfo(b.getLocation(), "capacity"));
     }
 
     public int[] getInputSlots() {
@@ -199,11 +199,11 @@ public abstract class Barrel extends SlimefunItem {
     private ItemStack getCapacityItem(Block b) {
         StringBuilder bar = new StringBuilder();
         //needs null check?
-        String stored = BlockStorage.getBlockInfo(b, "storedItems");
+        String stored = BlockStorage.getLocationInfo(b.getLocation(), "storedItems");
         if(stored == null){
         	System.out.println(stored);
-        	System.out.println(BlockStorage.getBlockInfo(b, "owner"));
-        	System.out.println(BlockStorage.getBlockInfo(b, "capacity"));
+        	System.out.println(BlockStorage.getLocationInfo(b.getLocation(), "owner"));
+        	System.out.println(BlockStorage.getLocationInfo(b.getLocation(), "capacity"));
         	return null;
         }
         	
@@ -237,7 +237,7 @@ public abstract class Barrel extends SlimefunItem {
 
         bar.append("&8] &7- " + percentage + "%");
 
-        return new CustomItem(new ItemStack(Material.CAULDRON_ITEM), "&7" + BlockStorage.getBlockInfo(b, "storedItems") + "/" + getCapacity(b), ChatColor.translateAlternateColorCodes('&', bar.toString()));
+        return new CustomItem(new ItemStack(Material.CAULDRON_ITEM), "&7" + BlockStorage.getLocationInfo(b.getLocation(), "storedItems") + "/" + getCapacity(b), ChatColor.translateAlternateColorCodes('&', bar.toString()));
     }
     
     
@@ -260,10 +260,10 @@ public abstract class Barrel extends SlimefunItem {
                 ItemStack input = inventory.getItemInSlot(10);
 
                 if (isSimiliar(input, inventory.getItemInSlot(22))) {
-                    if (BlockStorage.getBlockInfo(b, "storedItems") == null) {
+                    if (BlockStorage.getLocationInfo(b.getLocation(), "storedItems") == null) {
                         BlockStorage.addBlockInfo(b, "storedItems", "1");
                     }
-                    int storedAmount = Integer.valueOf(BlockStorage.getBlockInfo(b, "storedItems"));
+                    int storedAmount = Integer.valueOf(BlockStorage.getLocationInfo(b.getLocation(), "storedItems"));
 
                     if (storedAmount < getCapacity(b)) {
                         if (storedAmount + input.getAmount() > getCapacity(b)) {
@@ -295,9 +295,9 @@ public abstract class Barrel extends SlimefunItem {
             }
         //}
 
-        if (BlockStorage.getBlockInfo(b, "storedItems") == null) return;
+        if (BlockStorage.getLocationInfo(b.getLocation(), "storedItems") == null) return;
 
-        int stored = Integer.valueOf(BlockStorage.getBlockInfo(b, "storedItems"));
+        int stored = Integer.valueOf(BlockStorage.getLocationInfo(b.getLocation(), "storedItems"));
         ItemStack output = inventory.getItemInSlot(22).clone();
 
         if (inventory.getItemInSlot(getOutputSlots()[0]) != null) {

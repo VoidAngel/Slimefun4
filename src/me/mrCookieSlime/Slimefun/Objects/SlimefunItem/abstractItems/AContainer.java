@@ -26,7 +26,6 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -361,7 +360,7 @@ public abstract class AContainer extends SlimefunItem {
 			}
 			
 			if (r != null) {
-				if (!fits(b, r.getOutput())) return;
+				if (!fits(b, r.getOutput().clone())) return;
 				for (Map.Entry<Integer, Integer> entry: found.entrySet()) {
 					BlockStorage.getInventory(b).replaceExistingItem(entry.getKey(), InvUtils.decreaseItem(BlockStorage.getInventory(b).getItemInSlot(entry.getKey()), entry.getValue()));
 				}

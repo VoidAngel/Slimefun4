@@ -3,19 +3,14 @@ package me.mrCookieSlime.Slimefun.Objects.SlimefunItem.machines;
 import me.mrCookieSlime.CSCoreLibPlugin.CSCoreLib;
 import me.mrCookieSlime.CSCoreLibPlugin.Configuration.Config;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ClickAction;
-import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.InvUtils;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu.MenuClickHandler;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.Item.CustomItem;
-import me.mrCookieSlime.CSCoreLibPlugin.general.Particles.MC_1_8.ParticleEffect;
-import me.mrCookieSlime.CSCoreLibPlugin.general.World.Animals;
 import me.mrCookieSlime.Slimefun.Lists.RecipeType;
-import me.mrCookieSlime.Slimefun.Lists.SlimefunItems;
 import me.mrCookieSlime.Slimefun.Objects.Category;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunBlockHandler;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.SlimefunItem;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.UnregisterReason;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.handlers.BlockTicker;
-import me.mrCookieSlime.Slimefun.Setup.SlimefunManager;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.mrCookieSlime.Slimefun.api.energy.ChargableBlock;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
@@ -23,8 +18,6 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
@@ -47,7 +40,7 @@ public abstract class SoundMuffler extends SlimefunItem {
 			@Override
 			public void newInstance(final BlockMenu menu, final Block b) {
 				int volume = 10;
-				if (!BlockStorage.hasBlockInfo(b) || BlockStorage.getBlockInfo(b, "enabled") == null) {
+				if (!BlockStorage.hasBlockInfo(b) || BlockStorage.getLocationInfo(b.getLocation(), "enabled") == null) {
 					BlockStorage.addBlockInfo(b, "volume", String.valueOf(volume));
 					menu.replaceExistingItem(8, new CustomItem(new MaterialData(Material.SULPHUR), "&7Enabled: &4\u2718", "", "&e> Click to enable this Machine"));
 					menu.replaceExistingItem(0, new CustomItem(new MaterialData(Material.PAPER), 
@@ -93,11 +86,11 @@ public abstract class SoundMuffler extends SlimefunItem {
 						}
 					});
 				}
-				else if(BlockStorage.getBlockInfo(b, "enabled").equals("false"))
+				else if(BlockStorage.getLocationInfo(b.getLocation(), "enabled").equals("false"))
 				{
 					menu.replaceExistingItem(8, new CustomItem(new MaterialData(Material.SULPHUR), "&7Enabled: &4\u2718", "", "&e> Click to enable this Machine"));
 					menu.replaceExistingItem(0, new CustomItem(new MaterialData(Material.PAPER), 
-							"&eVolume: &b" + BlockStorage.getBlockInfo(b, "volume"), 
+							"&eVolume: &b" + BlockStorage.getLocationInfo(b.getLocation(), "volume"), 
 							"&7Valid value range: 0-100",
 			                "&7L-click: -10",
 			                "&7R-click: +10",
@@ -107,7 +100,7 @@ public abstract class SoundMuffler extends SlimefunItem {
 						@Override
 						public boolean onClick(Player p, int arg1, ItemStack arg2, ClickAction arg3) {
 							int newVolume = 0;
-							int lastVolume = Integer.parseInt(BlockStorage.getBlockInfo(b, "volume"));
+							int lastVolume = Integer.parseInt(BlockStorage.getLocationInfo(b.getLocation(), "volume"));
 							
 							if(arg3.isRightClicked())
 							{
@@ -142,7 +135,7 @@ public abstract class SoundMuffler extends SlimefunItem {
 				else {
 					menu.replaceExistingItem(8, new CustomItem(new MaterialData(Material.REDSTONE), "&7Enabled: &2\u2714", "", "&e> Click to disable this Machine"));
 					menu.replaceExistingItem(0, new CustomItem(new MaterialData(Material.PAPER), 
-							"&eVolume: &b" + BlockStorage.getBlockInfo(b, "volume"), 
+							"&eVolume: &b" + BlockStorage.getLocationInfo(b.getLocation(), "volume"), 
 							"&7Valid value range: 0-100",
 			                "&7L-click: -10",
 			                "&7R-click: +10",
@@ -152,7 +145,7 @@ public abstract class SoundMuffler extends SlimefunItem {
 						@Override
 						public boolean onClick(Player p, int arg1, ItemStack arg2, ClickAction arg3) {
 							int newVolume = 0;
-							int lastVolume = Integer.parseInt(BlockStorage.getBlockInfo(b, "volume"));
+							int lastVolume = Integer.parseInt(BlockStorage.getLocationInfo(b.getLocation(), "volume"));
 							
 							if(arg3.isRightClicked())
 							{

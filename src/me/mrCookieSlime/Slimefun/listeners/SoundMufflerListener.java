@@ -32,16 +32,16 @@ public class SoundMufflerListener extends PacketAdapter implements Listener {
             for (String sm : BlockStorage.loaded_mufflers) {
             	Location l = deserializeLocation(sm);
                 if (loc.getWorld().equals(l.getWorld()) && loc.distanceSquared(l) < distance) {
-                	if(BlockStorage.hasBlockInfo(l) && BlockStorage.getBlockInfo(l, "enabled") != null)
+                	if(BlockStorage.hasBlockInfo(l) && BlockStorage.getLocationInfo(l, "enabled") != null)
                 	{
-                		if (BlockStorage.getBlockInfo(l, "enabled").equals("true"))
+                		if (BlockStorage.getLocationInfo(l, "enabled").equals("true"))
                 		{
                 			try{
-		                    	if(Integer.parseInt(BlockStorage.getBlockInfo(l, "energy-charge")) >= 8)
+		                    	if(Integer.parseInt(BlockStorage.getLocationInfo(l, "energy-charge")) >= 8)
 		                    	{
 				                	int volume = 10;
 				                	try{
-				                		volume = Integer.parseInt(BlockStorage.getBlockInfo(l, "volume"));
+				                		volume = Integer.parseInt(BlockStorage.getLocationInfo(l, "volume"));
 				                	}catch(Exception e){
 				                		System.out.println("SOUND MUFFLERS VOLUME COULD NOT BE FOUND. DEFAULTING TO 10.");
 				                	}

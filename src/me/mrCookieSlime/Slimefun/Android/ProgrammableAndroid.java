@@ -766,7 +766,7 @@ public abstract class ProgrammableAndroid extends SlimefunItem {
 	}
 	private void mine2(Block b, Block block) {
 		Collection<ItemStack> drops = block.getDrops();
-		if (!blockblacklist.contains(block.getType()) && !drops.isEmpty() && CSCoreLib.getLib().getProtectionManager().canBuild(UUID.fromString(BlockStorage.getBlockInfo(b, "owner")), block)) {
+		if (!blockblacklist.contains(block.getType()) && !drops.isEmpty() && CSCoreLib.getLib().getProtectionManager().canBuild(UUID.fromString(BlockStorage.getLocationInfo(b.getLocation(), "owner")), block)) {
 			SlimefunItem item = BlockStorage.check(block);
 			if(item != null) {
 				if(fits(b, item.getItem())) {
@@ -787,7 +787,7 @@ public abstract class ProgrammableAndroid extends SlimefunItem {
 					drops.addAll(block.getDrops());
 				}
 				
-				if (!blockblacklist.contains(block.getType()) && !drops.isEmpty() && !isProtected(UUID.fromString(BlockStorage.getBlockInfo(b, "owner")), block)) {
+				if (!blockblacklist.contains(block.getType()) && !drops.isEmpty() && !isProtected(UUID.fromString(BlockStorage.getLocationInfo(b.getLocation(), "owner")), block)) {
 					ItemStack[] items = drops.toArray(new ItemStack[drops.size()]);
 					
 					if (fits(b, items)) {
