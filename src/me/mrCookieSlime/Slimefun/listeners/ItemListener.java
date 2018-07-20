@@ -8,9 +8,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BrewingStand;
+import org.bukkit.block.Dispenser;
 import org.bukkit.block.Hopper;
 import org.bukkit.block.Skull;
+import org.bukkit.craftbukkit.v1_12_R1.block.CraftHopper;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Wither;
@@ -25,6 +28,7 @@ import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.BrewerInventory;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
@@ -48,6 +52,7 @@ import me.mrCookieSlime.Slimefun.Lists.SlimefunItems;
 import me.mrCookieSlime.Slimefun.Misc.BookDesign;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.Juice;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.MultiTool;
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.SlimefunGadget;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.SlimefunItem;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.Interfaces.NotPlaceable;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.handlers.ItemHandler;
@@ -73,13 +78,18 @@ public class ItemListener implements Listener {
 	 * @param e InventoryMoveItemEvent
 	 * @since 4.1.11
 	 */
-	@EventHandler
-	public void onIgnitionChamberItemMove(InventoryMoveItemEvent e) {
-		if (e.getInitiator().getHolder() instanceof Hopper) {
-			if (BlockStorage.check(((Hopper) e.getInitiator().getHolder()).getBlock(), "IGNITION_CHAMBER")) {
-				e.setCancelled(true);
-			}
-		}
+    @EventHandler
+    public void onIgnitionChamberItemMove(InventoryMoveItemEvent e) {
+        if (e.getInitiator().getHolder() instanceof Hopper && e.getDestination().getHolder() instanceof Dispenser) {
+        	if (BlockStorage.check(((Hopper) e.getInitiator().getHolder()).getBlock(), "IGNITION_CHAMBER")) {
+        		CraftHopper chamber = ((CraftHopper) e.getInitiator().getHolder());
+        		BlockFace hopperFace = ((CraftHopper) e.getInitiator().getHolder()).getBlock().getFace(((Dispenser) e.getDestination().getHolder()).getBlock());
+        		org.bukkit.material.Hopper newHopper = new org.bukkit.material.Hopper(hopperFace, false);
+
+        		chamber.setData(newHopper);
+        		e.setCancelled(true);
+        	}
+        }
 	}
 
 	@SuppressWarnings("deprecation")
@@ -165,12 +175,24 @@ public class ItemListener implements Listener {
 	@SuppressWarnings("deprecation")
 	@EventHandler(priority=EventPriority.NORMAL)
 	public void onRightClick(ItemUseEvent e) {
+		final Player p = e.getPlayer();
+		ItemStack item = e.getItem();
+		ItemStack item2 = e.getPlayer().getItemInHand();
+		if(item2 != null && item2.getType() == Material.SAPLING) {
+			if (e.getClickedBlock() != null) {
+				SlimefunItem machine = BlockStorage.check(e.getClickedBlock());
+				if (machine != null && machine.getID().equals("COMPOSTER")) {
+					for (ItemHandler handler: machine.getHandlers()) {
+						if (((ItemInteractionHandler) handler).onRightClick(e, p, item2)) return;
+					}
+					return;
+				}
+			}
+		}
 		if (e.getParentEvent() != null && !e.getParentEvent().getHand().equals(EquipmentSlot.HAND)) {
 			return;
 		}
-
-		final Player p = e.getPlayer();
-		ItemStack item = e.getItem();
+		if(!e.getParentEvent().getHand().equals(EquipmentSlot.HAND)) return;
 		if (SlimefunManager.isItemSimiliar(item, SlimefunGuide.getItem(BookDesign.BOOK), true)) {
 			if (p.isSneaking()) SlimefunGuide.openSettings(p, item);
 			else SlimefunGuide.openGuide(p, true);
@@ -412,7 +434,7 @@ public class ItemListener implements Listener {
 			        if (b.hasMetadata("ChangeBackItem")) {
 			        	e.setCancelled(true);
 			            final ItemStack itemStack = (ItemStack)b.getMetadata("ChangeBackItem").get(0).value();
-			            if (itemStack.getType().isBlock() || itemStack.getType() == Material.SKULL_ITEM) {
+			            if (itemStack.getType().isBlock() || itemStack.getType() == Material.SKULL_ITEM || itemStack.getType() == Material.SAPLING) {
 			            	SlimefunItem sfItem = SlimefunItem.getByItem(itemStack);
 							if (sfItem != null && !(sfItem instanceof NotPlaceable)){
 								if(!BlockStorage.hasBlockInfo(b)) {
@@ -465,6 +487,30 @@ public class ItemListener implements Listener {
 				}
 			}
 		}
+	}
+	
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void onStructureGrow(StructureGrowEvent e) {
+		Block b = e.getLocation().getBlock();
+		if(b != null && b.getType() == Material.SAPLING) {
+			if(ChangeBackItem.get().isValidBlockForRestoreItem(b)) {
+			     if (b.hasMetadata("ChangeBackItem")) {
+			      	e.setCancelled(true);
+			        final ItemStack itemStack = (ItemStack)b.getMetadata("ChangeBackItem").get(0).value();
+			        SlimefunItem sfItem = SlimefunItem.getByItem(itemStack);
+			        if (sfItem != null){
+			        	if(!BlockStorage.hasBlockInfo(b)) {
+			        		BlockStorage.addBlockInfo(b, "id", sfItem.getID(), true);
+			        		if (SlimefunItem.blockhandler.containsKey(sfItem.getID())) {
+			        			SlimefunItem.blockhandler.get(sfItem.getID()).onPlace(e.getPlayer(), b, sfItem);
+			        		}
+			        		System.out.println("Slimefun Fix > " + sfItem.getID() + " block fixed for player " + e.getPlayer().getName());
+			        		return;
+			        	}
+					}
+			    }
+			}
+		}		
 	}
 	
 	@EventHandler (ignoreCancelled = true)

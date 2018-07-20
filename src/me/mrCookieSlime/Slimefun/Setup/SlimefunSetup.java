@@ -1965,7 +1965,27 @@ public class SlimefunSetup {
 					e.setExpToDrop(0);
 					return true;
 				}
-				else return false;
+				else if(!Variables.spawnerBreakConfirm.contains(e.getPlayer().getUniqueId())) {
+					if(e.getBlock().getType() == Material.MOB_SPAWNER) {
+						e.setCancelled(true);
+						UUID id = e.getPlayer().getUniqueId();
+						Variables.spawnerBreakConfirm.add(id);
+						e.getPlayer().sendMessage(ChatColor.RED + "You are about to destroy this spawner! Break again in the next 20 seconds to confirm, otherwise use a " + ChatColor.YELLOW + "pickaxe of containment" + ChatColor.RED + " to salvage a broken spawner from this.");
+						Bukkit.getScheduler().scheduleSyncDelayedTask(SlimefunStartup.instance, new Runnable() {
+							@Override
+							public void run() {
+								if(e.getPlayer() != null && Variables.spawnerBreakConfirm.contains(id))
+									Variables.spawnerBreakConfirm.remove(id);
+							}
+						}, 400L);
+					}	
+				}
+				else {
+					if(e.getBlock().getType() == Material.MOB_SPAWNER) {
+						Variables.spawnerBreakConfirm.remove(e.getPlayer().getUniqueId());
+					}	
+				}
+				return false;
 			}
 		});
 
@@ -2063,7 +2083,13 @@ public class SlimefunSetup {
 				if (mb.isMultiBlock(SlimefunItem.getByID("DIGITAL_MINER"))) {
 					if (CSCoreLib.getLib().getProtectionManager().canAccessChest(p.getUniqueId(), b, true)) {
 						if (Slimefun.hasUnlocked(p, SlimefunItems.DIGITAL_MINER, true)) {
-							Chest chest = (Chest) b.getRelative(BlockFace.UP).getState();
+							Block chestBlock = b.getRelative(BlockFace.UP);
+							if(!(BlockStorage.check(chestBlock.getRelative(BlockFace.WEST), "SOLAR_PANEL") && BlockStorage.check(chestBlock.getRelative(BlockFace.EAST), "SOLAR_PANEL")) &&
+									!(BlockStorage.check(chestBlock.getRelative(BlockFace.NORTH), "SOLAR_PANEL") && BlockStorage.check(chestBlock.getRelative(BlockFace.SOUTH), "SOLAR_PANEL"))) {
+								return false;
+							}
+							
+                        	Chest chest = (Chest) chestBlock.getState();
 							final Inventory inv = chest.getInventory();
 							List<Location> ores = new ArrayList<Location>();
 							for (int x = b.getX() - 4; x < b.getX() + 4; x++) {
@@ -2141,7 +2167,13 @@ public class SlimefunSetup {
 				if (mb.isMultiBlock(SlimefunItem.getByID("ADVANCED_DIGITAL_MINER"))) {
 					if (CSCoreLib.getLib().getProtectionManager().canAccessChest(p.getUniqueId(), b, true)) {
 						if (Slimefun.hasUnlocked(p, SlimefunItems.ADVANCED_DIGITAL_MINER, true)) {
-							Chest chest = (Chest) b.getRelative(BlockFace.UP).getState();
+							Block chestBlock = b.getRelative(BlockFace.UP);
+							if(!(BlockStorage.check(chestBlock.getRelative(BlockFace.WEST), "SOLAR_PANEL") && BlockStorage.check(chestBlock.getRelative(BlockFace.EAST), "SOLAR_PANEL")) &&
+									!(BlockStorage.check(chestBlock.getRelative(BlockFace.NORTH), "SOLAR_PANEL") && BlockStorage.check(chestBlock.getRelative(BlockFace.SOUTH), "SOLAR_PANEL"))) {
+								return false;
+							}
+
+							Chest chest = (Chest) chestBlock.getState();
 							final Inventory inv = chest.getInventory();
 							List<Location> ores = new ArrayList<Location>();
 							for (int x = b.getX() - 6; x < b.getX() + 6; x++) {
@@ -2984,6 +3016,23 @@ public class SlimefunSetup {
 						CreatureSpawner spawner = (CreatureSpawner) e.getBlock().getState();
 						spawner.setSpawnedType(type);
 						spawner.update(true, false);
+						
+						Bukkit.getScheduler().scheduleSyncDelayedTask(SlimefunStartup.instance, new Runnable() {
+							@Override
+							public void run() {
+								if(e.getBlock() != null && e.getBlock().getType() == Material.MOB_SPAWNER) {
+									CreatureSpawner spawner2 = (CreatureSpawner) e.getBlock().getState();
+									EntityType type2 = null;
+									for (String line: item.getItemMeta().getLore()) {
+										if (ChatColor.stripColor(line).startsWith("Type: ")) type2 = EntityType.valueOf(ChatColor.stripColor(line).replace("Type: ", "").replace(" ", "_").toUpperCase());
+									}
+									if(type2 != null && spawner2.getSpawnedType() != type2) {
+										spawner2.setSpawnedType(type2);
+										spawner2.update(true, false);
+									}
+								}
+							}
+						}, 3L);
 					}
 					return true;
 				}

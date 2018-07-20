@@ -93,36 +93,40 @@ public class BlockStorage {
 			try {
 				for (File file: f.listFiles()) {
 					if (file.getName().endsWith(".sfb")) {
-						if (timestamp + info_delay < System.currentTimeMillis()) {
-							System.out.println("[Slimefun] Loading Blocks... " + Math.round((((done * 100.0f) / total) * 100.0f) / 100.0f) + "% done (\"" + w.getName() + "\")");
-							timestamp = System.currentTimeMillis();
-						}
-						
-						FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-						for (String key: cfg.getKeys(false)) {
-							Location l = deserializeLocation(key);
-							String chunk_string = locationToChunkString(l);
-							try {
-								totalBlocks++;
-								String json = cfg.getString(key);
-								Config blockInfo = parseBlockInfo(l, json);
-								if (blockInfo == null) continue;
-								storage.put(l, blockInfo);
-								if(file.getName().replace(".sfb", "").toString().equals("SOUND_MUFFLER"))
-									loaded_mufflers.add(key);
-								
-								if (SlimefunItem.isTicking(file.getName().replace(".sfb", ""))) {
-									Set<Location> locations = ticking_chunks.containsKey(chunk_string) ? ticking_chunks.get(chunk_string): new HashSet<Location>();
-									locations.add(l);
-									ticking_chunks.put(chunk_string, locations);
-									if (!loaded_tickers.contains(chunk_string)) loaded_tickers.add(chunk_string);
-								}
-							} catch (Exception x) {
-								System.err.println("[Slimefun] Failed to load " + file.getName() + "(ERR: " + key + ")");
-								x.printStackTrace();
+						if(!file.getName().equals("null.sfb")) {
+							if (timestamp + info_delay < System.currentTimeMillis()) {
+								System.out.println("[Slimefun] Loading Blocks... " + Math.round((((done * 100.0f) / total) * 100.0f) / 100.0f) + "% done (\"" + w.getName() + "\")");
+								timestamp = System.currentTimeMillis();
 							}
+							
+							FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+							for (String key: cfg.getKeys(false)) {
+								Location l = deserializeLocation(key);
+								String chunk_string = locationToChunkString(l);
+								try {
+									totalBlocks++;
+									String json = cfg.getString(key);
+									Config blockInfo = parseBlockInfo(l, json);
+									if (blockInfo == null) continue;
+									storage.put(l, blockInfo);
+									if(file.getName().replace(".sfb", "").toString().equals("SOUND_MUFFLER"))
+										loaded_mufflers.add(key);
+									
+									if (SlimefunItem.isTicking(file.getName().replace(".sfb", ""))) {
+										Set<Location> locations = ticking_chunks.containsKey(chunk_string) ? ticking_chunks.get(chunk_string): new HashSet<Location>();
+										locations.add(l);
+										ticking_chunks.put(chunk_string, locations);
+										if (!loaded_tickers.contains(chunk_string)) loaded_tickers.add(chunk_string);
+									}
+								} catch (Exception x) {
+									System.err.println("[Slimefun] Failed to load " + file.getName() + "(ERR: " + key + ")");
+									x.printStackTrace();
+								}
+							}
+							done++;
 						}
-						done++;
+						else
+							System.out.println("[Slimefun] Skipping file null.sfb!");
 					}
 				}
 			} finally {
@@ -212,6 +216,7 @@ public class BlockStorage {
 		Map<String, Config> cache = new HashMap<String, Config>(cache_blocks);
 		
 		for (Map.Entry<String, Config> entry: cache.entrySet()) {
+			if(entry.getKey() == null) System.out.println("Saving null key! " + entry.getKey());
 			cache_blocks.remove(entry.getKey());
 			Config cfg = entry.getValue();
 			if (cfg.getKeys().isEmpty()) cfg.getFile().delete();

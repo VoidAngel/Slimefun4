@@ -52,10 +52,10 @@ public class ToolListener implements Listener {
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled = true)
 	public void onBlockRegister(BlockPlaceEvent e) {
-		if (!e.isCancelled() && BlockStorage.hasBlockInfo(e.getBlock())) {
+		if (!e.isCancelled() && BlockStorage.hasBlockInfo(e.getBlock().getLocation())) {
 			e.setCancelled(true);
 			System.out.println(BlockStorage.checkID(e.getBlock()) + " block cleared at " + e.getBlock().getLocation().toString());
-			BlockStorage.clearBlockInfo(e.getBlock());
+			BlockStorage.clearBlockInfo(e.getBlock().getLocation());
 			return;
 		}
 		ItemStack item = e.getItemInHand();
@@ -82,9 +82,9 @@ public class ToolListener implements Listener {
 	
 	@EventHandler
 	public void onBlockPlace(BlockPlaceEvent e) {
-		if (!e.isCancelled() && BlockStorage.hasBlockInfo(e.getBlock())) {
+		if (!e.isCancelled() && BlockStorage.hasBlockInfo(e.getBlock().getLocation())) {
 			System.out.println(BlockStorage.checkID(e.getBlock()) + " block cleared at " + e.getBlock().getLocation().toString());
-			BlockStorage.clearBlockInfo(e.getBlock());
+			BlockStorage.clearBlockInfo(e.getBlock().getLocation());
 			return;
 		}
 		ItemStack item = e.getItemInHand();
@@ -247,7 +247,7 @@ public class ToolListener implements Listener {
 						} catch (Exception e1) {
 							e1.printStackTrace();
 						}
-						if(!BlockStorage.hasBlockInfo(b) && SlimefunItem.map_texture.containsKey(texture)) {
+						if(!BlockStorage.hasBlockInfo(b.getLocation()) && SlimefunItem.map_texture.containsKey(texture)) {
 							SlimefunItem sfItem2 = SlimefunItem.getByID(SlimefunItem.map_texture.get(texture));
 							if (sfItem2 != null && !(sfItem2 instanceof NotPlaceable)){
 								drops.add(sfItem2.getItem());
@@ -285,7 +285,7 @@ public class ToolListener implements Listener {
     					success = SlimefunItem.blockhandler.get(item.getID()).onBreak(null, block, item, UnregisterReason.EXPLODE);
     				}
     				if (success) {
-    					BlockStorage.clearBlockInfo(block);
+    					BlockStorage.clearBlockInfo(block.getLocation());
         				block.setType(Material.AIR);
     				}
     			}
