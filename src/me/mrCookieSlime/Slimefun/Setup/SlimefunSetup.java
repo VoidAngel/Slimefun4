@@ -2379,7 +2379,7 @@ public class SlimefunSetup {
 		new ItemStack[] {null, null, null, new ItemStack(Material.HAY_BLOCK), null, new ItemStack(Material.HAY_BLOCK), new ItemStack(Material.HAY_BLOCK), null, new ItemStack(Material.HAY_BLOCK)})
 		.register(true);
 
-		final List<String> explosiveblacklist = Arrays.asList("BEDROCK", "ENDER_PORTAL_FRAME", "TNT", "REDSTONE_TORCH_OFF", "REDSTONE_TORCH_ON", "TORCH", "DRAGON_EGG", "REDSTONE_COMPARATOR_ON", "REDSTONE_COMPARATOR_OFF", "REDSTONE_WIRE", "CHEST");
+		final List<String> explosiveblacklist = Arrays.asList("BEDROCK", "ENDER_PORTAL_FRAME", "TNT", "REDSTONE_TORCH_OFF", "REDSTONE_TORCH_ON", "TORCH", "DRAGON_EGG", "REDSTONE_COMPARATOR_ON", "REDSTONE_COMPARATOR_OFF", "REDSTONE_WIRE", "CHEST", "SIGN", "WALL_SIGN", "SIGN_POST");
 		final List<String> noTouch = Arrays.asList("TNT", "REDSTONE_TORCH_OFF", "REDSTONE_TORCH_ON", "TORCH", "DRAGON_EGG", "REDSTONE_COMPARATOR_ON", "REDSTONE_COMPARATOR_OFF", "REDSTONE_WIRE", "STRING", "TRIPWIRE_HOOK", "TRIPWIRE", "SLIME_BLOCK");
 
 		new SlimefunItem(Categories.TOOLS, SlimefunItems.EXPLOSIVE_PICKAXE, "EXPLOSIVE_PICKAXE", RecipeType.MAGIC_WORKBENCH,

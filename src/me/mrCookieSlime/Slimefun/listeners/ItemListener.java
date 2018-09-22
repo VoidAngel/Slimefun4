@@ -468,7 +468,7 @@ public class ItemListener implements Listener {
 								}
 								System.out.println("Slimefun Fix > " + sfItem.getID() + " block fixed for player " + e.getPlayer().getName());	
 							}
-						} else if (hasInfo && texture.isEmpty()) {
+						} else if (hasInfo && (texture.isEmpty())) {
 							String sfItem = BlockStorage.checkID(b.getLocation());
 							if(sfItem != null) {
 								for(String textures:SlimefunItem.map_texture.keySet()) {
@@ -487,30 +487,6 @@ public class ItemListener implements Listener {
 				}
 			}
 		}
-	}
-	
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void onStructureGrow(StructureGrowEvent e) {
-		Block b = e.getLocation().getBlock();
-		if(b != null && b.getType() == Material.SAPLING) {
-			if(ChangeBackItem.get().isValidBlockForRestoreItem(b)) {
-			     if (b.hasMetadata("ChangeBackItem")) {
-			      	e.setCancelled(true);
-			        final ItemStack itemStack = (ItemStack)b.getMetadata("ChangeBackItem").get(0).value();
-			        SlimefunItem sfItem = SlimefunItem.getByItem(itemStack);
-			        if (sfItem != null){
-			        	if(!BlockStorage.hasBlockInfo(b)) {
-			        		BlockStorage.addBlockInfo(b, "id", sfItem.getID(), true);
-			        		if (SlimefunItem.blockhandler.containsKey(sfItem.getID())) {
-			        			SlimefunItem.blockhandler.get(sfItem.getID()).onPlace(e.getPlayer(), b, sfItem);
-			        		}
-			        		System.out.println("Slimefun Fix > " + sfItem.getID() + " block fixed for player " + e.getPlayer().getName());
-			        		return;
-			        	}
-					}
-			    }
-			}
-		}		
 	}
 	
 	@EventHandler (ignoreCancelled = true)
