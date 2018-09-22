@@ -38,7 +38,7 @@ public class ItemHash {
 		StringBuilder builder = new StringBuilder(LENGTH * 2);
 		
 		for (char c: item.getHash().toCharArray()) {
-			builder.append('ยง');
+			builder.append('ง');
 			builder.append(c);
 		}
 		

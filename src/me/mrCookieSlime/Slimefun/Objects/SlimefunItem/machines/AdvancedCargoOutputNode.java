@@ -1,17 +1,16 @@
 package me.mrCookieSlime.Slimefun.Objects.SlimefunItem.machines;
 
+import me.mrCookieSlime.CSCoreLibPlugin.compatibility.MaterialHelper;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.MaterialData;
 
 import me.mrCookieSlime.CSCoreLibPlugin.CSCoreLib;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu.MenuClickHandler;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ClickAction;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.Item.CustomItem;
 import me.mrCookieSlime.CSCoreLibPlugin.general.World.CustomSkull;
-import me.mrCookieSlime.Slimefun.Variables;
 import me.mrCookieSlime.Slimefun.Lists.RecipeType;
 import me.mrCookieSlime.Slimefun.Lists.SlimefunItems;
 import me.mrCookieSlime.Slimefun.Objects.Category;
@@ -39,31 +38,28 @@ public class AdvancedCargoOutputNode extends SlimefunItem {
 				constructMenu(this);
 			}
 
-			@SuppressWarnings("deprecation")
 			@Override
 			public void newInstance(final BlockMenu menu, final Block b) {
 				try {
 					if (!BlockStorage.hasBlockInfo(b) || BlockStorage.getLocationInfo(b.getLocation(), "filter-type") == null || BlockStorage.getLocationInfo(b.getLocation(), "filter-type").equals("whitelist")) {
-						menu.replaceExistingItem(15, new CustomItem(new MaterialData(Material.WOOL), "&7Type: &rWhitelist", "", "&e> Click to change it to Blacklist"));
+						menu.replaceExistingItem(15, new CustomItem(new ItemStack(Material.WHITE_WOOL), "&7Type: &rWhitelist", "", "&e> Click to change it to Blacklist"));
 						menu.addMenuClickHandler(15, new MenuClickHandler() {
 
 							@Override
 							public boolean onClick(Player p, int arg1, ItemStack arg2, ClickAction arg3) {
 								BlockStorage.addBlockInfo(b, "filter-type", "blacklist");
-								Variables.cargoFilterType.put(b.getLocation(), "blacklist");
 								newInstance(menu, b);
 								return false;
 							}
 						});
 					}
 					else {
-						menu.replaceExistingItem(15, new CustomItem(new MaterialData(Material.WOOL, (byte) 15), "&7Type: &8Blacklist", "", "&e> Click to change it to Whitelist"));
+						menu.replaceExistingItem(15, new CustomItem(new ItemStack(Material.BLACK_WOOL), "&7Type: &8Blacklist", "", "&e> Click to change it to Whitelist"));
 						menu.addMenuClickHandler(15, new MenuClickHandler() {
 
 							@Override
 							public boolean onClick(Player p, int arg1, ItemStack arg2, ClickAction arg3) {
 								BlockStorage.addBlockInfo(b, "filter-type", "whitelist");
-								Variables.cargoFilterType.put(b.getLocation(), "whitelist");
 								newInstance(menu, b);
 								return false;
 							}
@@ -71,26 +67,24 @@ public class AdvancedCargoOutputNode extends SlimefunItem {
 					}
 					
 					if (!BlockStorage.hasBlockInfo(b) || BlockStorage.getLocationInfo(b.getLocation(), "filter-durability") == null || BlockStorage.getLocationInfo(b.getLocation(), "filter-durability").equals("false")) {
-						menu.replaceExistingItem(16, new CustomItem(new MaterialData(Material.STONE_SWORD, (byte) 20), "&7Include Sub-IDs/Durability: &4\u2718", "", "&e> Click to toggle whether the Durability has to match"));
+						menu.replaceExistingItem(16, new CustomItem(new ItemStack(Material.STONE_SWORD, (byte) 20), "&7Include Sub-IDs/Durability: &4\u2718", "", "&e> Click to toggle whether the Durability has to match"));
 						menu.addMenuClickHandler(16, new MenuClickHandler() {
 
 							@Override
 							public boolean onClick(Player p, int arg1, ItemStack arg2, ClickAction arg3) {
 								BlockStorage.addBlockInfo(b, "filter-durability", "true");
-								Variables.cargoDurability.put(b.getLocation(), true);
 								newInstance(menu, b);
 								return false;
 							}
 						});
 					}
 					else {
-						menu.replaceExistingItem(16, new CustomItem(new MaterialData(Material.GOLD_SWORD, (byte) 20), "&7Include Sub-IDs/Durability: &2\u2714", "", "&e> Click to toggle whether the Durability has to match"));
+						menu.replaceExistingItem(16, new CustomItem(new ItemStack(Material.GOLDEN_SWORD, (byte) 20), "&7Include Sub-IDs/Durability: &2\u2714", "", "&e> Click to toggle whether the Durability has to match"));
 						menu.addMenuClickHandler(16, new MenuClickHandler() {
 
 							@Override
 							public boolean onClick(Player p, int arg1, ItemStack arg2, ClickAction arg3) {
 								BlockStorage.addBlockInfo(b, "filter-durability", "false");
-								Variables.cargoDurability.put(b.getLocation(), false);
 								newInstance(menu, b);
 								return false;
 							}
@@ -98,26 +92,24 @@ public class AdvancedCargoOutputNode extends SlimefunItem {
 					}
 					
 					if (!BlockStorage.hasBlockInfo(b) || BlockStorage.getLocationInfo(b.getLocation(), "filter-lore") == null || BlockStorage.getLocationInfo(b.getLocation(), "filter-lore").equals("true")) {
-						menu.replaceExistingItem(25, new CustomItem(new MaterialData(Material.EMPTY_MAP), "&7Include Lore: &2\u2714", "", "&e> Click to toggle whether the Lore has to match"));
+						menu.replaceExistingItem(25, new CustomItem(new ItemStack(Material.MAP), "&7Include Lore: &2\u2714", "", "&e> Click to toggle whether the Lore has to match"));
 						menu.addMenuClickHandler(25, new MenuClickHandler() {
 
 							@Override
 							public boolean onClick(Player p, int arg1, ItemStack arg2, ClickAction arg3) {
 								BlockStorage.addBlockInfo(b, "filter-lore", "false");
-								Variables.cargoLore.put(b.getLocation(), false);
 								newInstance(menu, b);
 								return false;
 							}
 						});
 					}
 					else {
-						menu.replaceExistingItem(25, new CustomItem(new MaterialData(Material.EMPTY_MAP), "&7Include Lore: &4\u2718", "", "&e> Click to toggle whether the Lore has to match"));
+						menu.replaceExistingItem(25, new CustomItem(new ItemStack(Material.MAP), "&7Include Lore: &4\u2718", "", "&e> Click to toggle whether the Lore has to match"));
 						menu.addMenuClickHandler(25, new MenuClickHandler() {
 
 							@Override
 							public boolean onClick(Player p, int arg1, ItemStack arg2, ClickAction arg3) {
 								BlockStorage.addBlockInfo(b, "filter-lore", "true");
-								Variables.cargoLore.put(b.getLocation(), true);
 								newInstance(menu, b);
 								return false;
 							}
@@ -153,7 +145,7 @@ public class AdvancedCargoOutputNode extends SlimefunItem {
 						});
 					}
 					else {
-						menu.replaceExistingItem(42, new CustomItem(new MaterialData(Material.WOOL, (byte) channel), "&bChannel ID: &3" + (channel + 1)));
+						menu.replaceExistingItem(42, new CustomItem(new ItemStack(MaterialHelper.WoolColours[channel]), "&bChannel ID: &3" + (channel + 1)));
 						menu.addMenuClickHandler(42, new MenuClickHandler() {
 
 							@Override
@@ -226,18 +218,14 @@ public class AdvancedCargoOutputNode extends SlimefunItem {
 						}
 					}
 				}
-				Variables.cargoLore.remove(b.getLocation());
-				Variables.cargoDurability.remove(b.getLocation());
-				Variables.cargoFilterType.remove(b.getLocation());
 				return true;
 			}
 		});
 	}
 	
-	@SuppressWarnings("deprecation")
 	protected void constructMenu(BlockMenuPreset preset) {
 		for (int i: border) {
-			preset.addItem(i, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte) 9), " "),
+			preset.addItem(i, new CustomItem(new ItemStack(Material.CYAN_STAINED_GLASS_PANE), " "),
 			new MenuClickHandler() {
 
 				@Override
@@ -248,7 +236,7 @@ public class AdvancedCargoOutputNode extends SlimefunItem {
 			});
 		}
 
-		preset.addItem(2, new CustomItem(new MaterialData(Material.PAPER), "&3Items", "", "&bPut in all Items you want to", "&bblacklist/whitelist"),
+		preset.addItem(2, new CustomItem(new ItemStack(Material.PAPER), "&3Items", "", "&bPut in all Items you want to", "&bblacklist/whitelist"),
 		new MenuClickHandler() {
 
 			@Override

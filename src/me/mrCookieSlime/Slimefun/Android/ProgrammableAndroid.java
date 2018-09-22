@@ -1,7 +1,42 @@
 package me.mrCookieSlime.Slimefun.Android;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Effect;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.Dispenser;
+import org.bukkit.block.Skull;
+import org.bukkit.entity.Ageable;
+import org.bukkit.entity.Animals;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Monster;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
+
 import me.mrCookieSlime.CSCoreLibPlugin.CSCoreLib;
 import me.mrCookieSlime.CSCoreLibPlugin.Configuration.Config;
+import me.mrCookieSlime.CSCoreLibPlugin.compatibility.MaterialHelper;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Block.TreeCalculator;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu.AdvancedMenuClickHandler;
@@ -9,11 +44,12 @@ import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu.MenuClickHan
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu.MenuOpeningHandler;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ClickAction;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.InvUtils;
-import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.Item.CustomItem;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.MenuHelper;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.MenuHelper.ChatHandler;
+import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.Item.CustomItem;
 import me.mrCookieSlime.CSCoreLibPlugin.general.World.CustomSkull;
 import me.mrCookieSlime.ExoticGarden.ExoticGarden;
+import me.mrCookieSlime.Slimefun.SlimefunStartup;
 import me.mrCookieSlime.Slimefun.Android.ScriptComparators.ScriptReputationSorter;
 import me.mrCookieSlime.Slimefun.Lists.RecipeType;
 import me.mrCookieSlime.Slimefun.Lists.SlimefunItems;
@@ -25,39 +61,18 @@ import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineFuel;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.handlers.BlockTicker;
 import me.mrCookieSlime.Slimefun.Setup.Messages;
 import me.mrCookieSlime.Slimefun.Setup.SlimefunManager;
-import me.mrCookieSlime.Slimefun.SlimefunStartup;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
-import me.mrCookieSlime.Slimefun.api.Slimefun;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
 import me.mrCookieSlime.Slimefun.holograms.AndroidStatusHologram;
-import org.bukkit.*;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.Dispenser;
-import org.bukkit.block.Skull;
-import org.bukkit.entity.*;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.MaterialData;
-import org.bukkit.metadata.FixedMetadataValue;
-
-import com.wasteofplastic.askyblock.ASkyBlock;
-import com.wasteofplastic.askyblock.ASkyBlockAPI;
-import com.wasteofplastic.askyblock.Island;
-
-import java.io.File;
-import java.util.*;
 
 public abstract class ProgrammableAndroid extends SlimefunItem {
 
 	private static final int[] border = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 18, 24, 25, 26, 27, 33, 35, 36, 42, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53};
 	private static final int[] border_out = {10, 11, 12, 13, 14, 19, 23, 28, 32, 37, 38, 39, 40, 41};
-
-	@SuppressWarnings("deprecation")
-	private static final ItemStack[] fish = new ItemStack[] {new MaterialData(Material.RAW_FISH, (byte) 0).toItemStack(1), new MaterialData(Material.RAW_FISH, (byte) 0).toItemStack(1), new MaterialData(Material.RAW_FISH, (byte) 0).toItemStack(1), new MaterialData(Material.RAW_FISH, (byte) 0).toItemStack(1), new MaterialData(Material.RAW_FISH, (byte) 1).toItemStack(1), new MaterialData(Material.RAW_FISH, (byte) 1).toItemStack(1), new MaterialData(Material.RAW_FISH, (byte) 1).toItemStack(1), new MaterialData(Material.RAW_FISH, (byte) 2).toItemStack(1), new MaterialData(Material.RAW_FISH, (byte) 2).toItemStack(1), new MaterialData(Material.RAW_FISH, (byte) 2).toItemStack(1), new MaterialData(Material.RAW_FISH, (byte) 2).toItemStack(1), new MaterialData(Material.RAW_FISH, (byte) 3).toItemStack(1), new MaterialData(Material.RAW_FISH, (byte) 3).toItemStack(1), new MaterialData(Material.RAW_FISH, (byte) 3).toItemStack(1), new ItemStack(Material.STRING), new ItemStack(Material.BONE), new ItemStack(Material.BONE), new ItemStack(Material.BONE), new ItemStack(Material.STICK), new ItemStack(Material.STICK), new ItemStack(Material.STICK), new ItemStack(Material.STICK), new ItemStack(Material.NAME_TAG)};
+	
+	private static final ItemStack[] fish = new ItemStack[] {new ItemStack(Material.COD), new ItemStack(Material.SALMON), new ItemStack(Material.PUFFERFISH), new ItemStack(Material.TROPICAL_FISH), new ItemStack(Material.STRING), new ItemStack(Material.BONE), new ItemStack(Material.STICK)};
 
 	private static final List<BlockFace> directions = Arrays.asList(BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST);
 	private static final List<Material> blockblacklist = new ArrayList<Material>();
@@ -65,10 +80,10 @@ public abstract class ProgrammableAndroid extends SlimefunItem {
 	static {
 		blockblacklist.add(Material.BEDROCK);
 		blockblacklist.add(Material.BARRIER);
-		blockblacklist.add(Material.ENDER_PORTAL_FRAME);
-		blockblacklist.add(Material.COMMAND);
-		blockblacklist.add(Material.COMMAND_CHAIN);
-		blockblacklist.add(Material.COMMAND_REPEATING);
+		blockblacklist.add(Material.END_PORTAL_FRAME);
+		blockblacklist.add(Material.COMMAND_BLOCK);
+		blockblacklist.add(Material.CHAIN_COMMAND_BLOCK);
+		blockblacklist.add(Material.REPEATING_COMMAND_BLOCK);
 	}
 
 	private Set<MachineFuel> recipes = new HashSet<MachineFuel>();
@@ -90,37 +105,37 @@ public abstract class ProgrammableAndroid extends SlimefunItem {
 		super(category, item, name, recipeType, recipe);
 
 
-		switch (getTier())
-		{
-		case 3:
-			registerFuel(new MachineFuel(2500, SlimefunItems.URANIUM));
-			registerFuel(new MachineFuel(1200, SlimefunItems.NEPTUNIUM));
-			registerFuel(new MachineFuel(3000, SlimefunItems.BOOSTED_URANIUM));
-		case 2:
-			registerFuel(new MachineFuel(100, new ItemStack(Material.LAVA_BUCKET)));
-			registerFuel(new MachineFuel(200, SlimefunItems.BUCKET_OF_OIL));
-			registerFuel(new MachineFuel(500, SlimefunItems.BUCKET_OF_FUEL));
-		default:
-			registerFuel(new MachineFuel(80, new MaterialData(Material.COAL, (byte) 0).toItemStack(1)));
-			registerFuel(new MachineFuel(80, new MaterialData(Material.COAL, (byte) 1).toItemStack(1)));
+		if (getTier() == 1) {
+			registerFuel(new MachineFuel(80, new ItemStack(Material.COAL)));
+			registerFuel(new MachineFuel(80, new ItemStack(Material.CHARCOAL)));
 			registerFuel(new MachineFuel(800, new ItemStack(Material.COAL_BLOCK)));
 			registerFuel(new MachineFuel(45, new ItemStack(Material.BLAZE_ROD)));
 
 			// Logs
-			registerFuel(new MachineFuel(4, new MaterialData(Material.LOG, (byte) 0).toItemStack(1)));
-			registerFuel(new MachineFuel(4, new MaterialData(Material.LOG, (byte) 1).toItemStack(1)));
-			registerFuel(new MachineFuel(4, new MaterialData(Material.LOG, (byte) 2).toItemStack(1)));
-			registerFuel(new MachineFuel(4, new MaterialData(Material.LOG, (byte) 3).toItemStack(1)));
-			registerFuel(new MachineFuel(4, new MaterialData(Material.LOG_2, (byte) 0).toItemStack(1)));
-			registerFuel(new MachineFuel(4, new MaterialData(Material.LOG_2, (byte) 1).toItemStack(1)));
+			registerFuel(new MachineFuel(4, new ItemStack(Material.OAK_LOG)));
+			registerFuel(new MachineFuel(4, new ItemStack(Material.BIRCH_LOG)));
+			registerFuel(new MachineFuel(4, new ItemStack(Material.SPRUCE_LOG)));
+			registerFuel(new MachineFuel(4, new ItemStack(Material.JUNGLE_LOG)));
+			registerFuel(new MachineFuel(4, new ItemStack(Material.DARK_OAK_LOG)));
+			registerFuel(new MachineFuel(4, new ItemStack(Material.ACACIA_LOG)));
 
 			// Wooden Planks
-			registerFuel(new MachineFuel(1, new MaterialData(Material.WOOD, (byte) 0).toItemStack(1)));
-			registerFuel(new MachineFuel(1, new MaterialData(Material.WOOD, (byte) 1).toItemStack(1)));
-			registerFuel(new MachineFuel(1, new MaterialData(Material.WOOD, (byte) 2).toItemStack(1)));
-			registerFuel(new MachineFuel(1, new MaterialData(Material.WOOD, (byte) 3).toItemStack(1)));
-			registerFuel(new MachineFuel(1, new MaterialData(Material.WOOD, (byte) 4).toItemStack(1)));
-			registerFuel(new MachineFuel(1, new MaterialData(Material.WOOD, (byte) 5).toItemStack(1)));
+			registerFuel(new MachineFuel(1, new ItemStack(Material.OAK_PLANKS)));
+			registerFuel(new MachineFuel(1, new ItemStack(Material.BIRCH_PLANKS)));
+			registerFuel(new MachineFuel(1, new ItemStack(Material.SPRUCE_PLANKS)));
+			registerFuel(new MachineFuel(1, new ItemStack(Material.JUNGLE_PLANKS)));
+			registerFuel(new MachineFuel(1, new ItemStack(Material.DARK_OAK_PLANKS)));
+			registerFuel(new MachineFuel(1, new ItemStack(Material.ACACIA_PLANKS)));
+		}
+		else if (getTier() == 2){
+			registerFuel(new MachineFuel(100, new ItemStack(Material.LAVA_BUCKET)));
+			registerFuel(new MachineFuel(200, SlimefunItems.BUCKET_OF_OIL));
+			registerFuel(new MachineFuel(500, SlimefunItems.BUCKET_OF_FUEL));
+		}
+		else {
+			registerFuel(new MachineFuel(2500, SlimefunItems.URANIUM));
+			registerFuel(new MachineFuel(1200, SlimefunItems.NEPTUNIUM));
+			registerFuel(new MachineFuel(3000, SlimefunItems.BOOSTED_URANIUM));
 		}
 
 		new BlockMenuPreset(name, getInventoryTitle()) {
@@ -136,14 +151,7 @@ public abstract class ProgrammableAndroid extends SlimefunItem {
 
 			@Override
 			public boolean canOpen(Block b, Player p) {
-				boolean open = false;
-				if(Slimefun.askyblock)
-				{
-					Island island = ASkyBlock.getPlugin().getGrid().getProtectedIslandAt(b.getLocation());
-					open = BlockStorage.getBlockInfo(b, "owner").equals(p.getUniqueId().toString()) || p.hasPermission("slimefun.android.bypass") || (island != null && island.getMembers().contains(p.getUniqueId()));
-				}
-				else
-					open = BlockStorage.getBlockInfo(b, "owner").equals(p.getUniqueId().toString()) || p.hasPermission("slimefun.android.bypass");
+				boolean open = BlockStorage.getLocationInfo(b.getLocation(), "owner").equals(p.getUniqueId().toString()) || p.hasPermission("slimefun.android.bypass");
 				if (!open) {
 					Messages.local.sendTranslation(p, "inventory.no-access", true);
 				}
@@ -212,7 +220,7 @@ public abstract class ProgrammableAndroid extends SlimefunItem {
 				BlockStorage.addBlockInfo(b, "fuel", "0");
 				BlockStorage.addBlockInfo(b, "rotation", "NORTH");
 				BlockStorage.addBlockInfo(b, "paused", "true");
-				b.setData((byte) 1);
+				b.setType(Material.PLAYER_HEAD);
 				Skull skull = (Skull) b.getState();
 				skull.setRotation(BlockFace.NORTH);
 				skull.update(true, false);
@@ -220,14 +228,7 @@ public abstract class ProgrammableAndroid extends SlimefunItem {
 
 			@Override
 			public boolean onBreak(Player p, Block b, SlimefunItem item, UnregisterReason reason) {
-				boolean allow = false;
-				if(Slimefun.askyblock)
-				{
-					Island island = ASkyBlock.getPlugin().getGrid().getProtectedIslandAt(b.getLocation());
-					allow = reason.equals(UnregisterReason.PLAYER_BREAK) && (BlockStorage.getBlockInfo(b, "owner").equals(p.getUniqueId().toString()) || p.hasPermission("slimefun.android.bypass") || (island != null && island.getMembers().contains(p.getUniqueId())));
-				}
-				else
-					allow = reason.equals(UnregisterReason.PLAYER_BREAK) && (BlockStorage.getBlockInfo(b, "owner").equals(p.getUniqueId().toString()) || p.hasPermission("slimefun.android.bypass"));
+				boolean allow =  reason.equals(UnregisterReason.PLAYER_BREAK) && (BlockStorage.getLocationInfo(b.getLocation(), "owner").equals(p.getUniqueId().toString()) || p.hasPermission("slimefun.android.bypass"));
 
 				if (allow) {
 					BlockMenu inv = BlockStorage.getInventory(b);
@@ -270,8 +271,7 @@ public abstract class ProgrammableAndroid extends SlimefunItem {
 						if (SlimefunManager.isItemSimiliar(item, recipe.getInput(), true)) {
 							BlockStorage.getInventory(b).replaceExistingItem(43, InvUtils.decreaseItem(item, 1));
 							if (getTier() == 2) {
-								if (item.getType() == Material.LAVA_BUCKET || item.getType() == Material.SKULL_ITEM)
-									pushItems(b, new ItemStack(Material.BUCKET));
+								pushItems(b, new ItemStack(Material.BUCKET));
 							}
 							BlockStorage.addBlockInfo(b, "fuel", String.valueOf((int) (recipe.getTicks() * this.getFuelEfficiency())));
 							break;
@@ -344,32 +344,23 @@ public abstract class ProgrammableAndroid extends SlimefunItem {
 						break;
 					}
 					case DIG_FORWARD: {
-						Block block = b.getRelative(BlockFace.valueOf(BlockStorage.getBlockInfo(b, "rotation")));
-						if (getTier() == 2)
-							mine2(b, block);
-						else
-							mine(b, block);
+						Block block = b.getRelative(BlockFace.valueOf(BlockStorage.getLocationInfo(b.getLocation(), "rotation")));
+						mine(b, block);
 						break;
 					}
 					case DIG_UP: {
 						Block block = b.getRelative(BlockFace.UP);
-						if (getTier() == 2)
-							mine2(b, block);
-						else
-							mine(b, block);
+						mine(b, block);
 						break;
 					}
 					case DIG_DOWN: {
 						Block block = b.getRelative(BlockFace.DOWN);
-						if (getTier() == 2)
-							mine2(b, block);
-						else
-							mine(b, block);
+						mine(b, block);
 						break;
 					}
 					case CATCH_FISH: {
 						Block block = b.getRelative(BlockFace.DOWN);
-						if (block.getType().equals(Material.STATIONARY_WATER)) {
+						if (block.getType().equals(Material.WATER)) {
 							block.getWorld().playSound(block.getLocation(), Sound.ENTITY_PLAYER_SPLASH, 1F, 1F);
 							if (CSCoreLib.randomizer().nextInt(100) < 10 * getTier()) {
 								ItemStack drop = fish[CSCoreLib.randomizer().nextInt(fish.length)];
@@ -470,7 +461,7 @@ public abstract class ProgrammableAndroid extends SlimefunItem {
 					case CHOP_TREE: {
 						BlockFace face = BlockFace.valueOf(BlockStorage.getLocationInfo(b.getLocation(), "rotation"));
 						Block block = b.getRelative(face);
-						if (block.getType().equals(Material.LOG) || block.getType().equals(Material.LOG_2)) {
+						if (MaterialHelper.isLog( block.getType())) {
 							List<Location> list = new ArrayList<Location>();
 							list.add(block.getLocation());
 		        			TreeCalculator.getTree(block.getLocation(), block.getLocation(), list);
@@ -485,10 +476,7 @@ public abstract class ProgrammableAndroid extends SlimefunItem {
 										pushItems(b, items);
 										log.getWorld().playEffect(log.getLocation(), Effect.STEP_SOUND, log.getType());
 										if (log.getY() == block.getY()) {
-											byte data = log.getData();
-											if (log.getType() == Material.LOG_2) data = (byte) (data + 4);
-				        					log.setType(Material.SAPLING);
-				        					log.setData(data);
+				        					log.setType(MaterialHelper.getSaplingFromLog(log.getType()));
 										}
 										else log.setType(Material.AIR);
 									}
@@ -726,8 +714,7 @@ public abstract class ProgrammableAndroid extends SlimefunItem {
 		if (block.getY() < 0 || block.getY() > block.getWorld().getMaxHeight()) return;
 
 		if (block.getType() == Material.AIR) {
-			block.setType(Material.SKULL);
-			block.setData((byte) 1);
+			block.setType(Material.PLAYER_HEAD);
 
 			Skull skull = (Skull) block.getState();
 			skull.setRotation(face);
@@ -764,57 +751,6 @@ public abstract class ProgrammableAndroid extends SlimefunItem {
 			}
 		}
 	}
-	private void mine2(Block b, Block block) {
-		Collection<ItemStack> drops = block.getDrops();
-		if (!blockblacklist.contains(block.getType()) && !drops.isEmpty() && CSCoreLib.getLib().getProtectionManager().canBuild(UUID.fromString(BlockStorage.getLocationInfo(b.getLocation(), "owner")), block)) {
-			SlimefunItem item = BlockStorage.check(block);
-			if(item != null) {
-				if(fits(b, item.getItem())) {
-					if(SlimefunItem.blockhandler.containsKey(item.getID())) {
-						if (SlimefunItem.blockhandler.get(item.getID()).onBreak(null, block, item, UnregisterReason.ANDROID_DIG)) {
-							pushItems(b, BlockStorage.retrieve(block));
-							if(SlimefunItem.blockhandler.containsKey(item.getID())) SlimefunItem.blockhandler.get(item.getID()).onBreak(null, block, item, UnregisterReason.ANDROID_DIG);
-							block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, block.getType());
-							block.setType(Material.AIR);
-						}
-					}
-				}
-			}else {
-				if (block.getType() == Material.EMERALD_ORE || block.getType() == Material.DIAMOND_ORE || block.getType() == Material.LAPIS_ORE 
-						|| block.getType() == Material.REDSTONE_ORE || block.getType() == Material.COAL_ORE || block.getType() == Material.COBBLESTONE
-						|| block.getType() == Material.STONE)
-				{
-					drops.addAll(block.getDrops());
-				}
-				
-				if (!blockblacklist.contains(block.getType()) && !drops.isEmpty() && !isProtected(UUID.fromString(BlockStorage.getLocationInfo(b.getLocation(), "owner")), block)) {
-					ItemStack[] items = drops.toArray(new ItemStack[drops.size()]);
-					
-					if (fits(b, items)) {
-						pushItems(b, items);
-						block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, block.getType());
-						block.setType(Material.AIR);
-					}
-				}
-			}
-		}
-	}
-	
-	private boolean isProtected(UUID player, Block b) {
-		if(Slimefun.askyblock)
-		{
-			Island island = ASkyBlockAPI.getInstance().getIslandAt(b.getLocation());
-			if (island == null) return false;
-			if (player.equals(island.getOwner())) return false;
-			
-			for (UUID member: island.getMembers()) {
-				if (player.equals(member)) return false;
-			}
-			if(BlockStorage.check(b) != null) return false;
-			return true;
-		}
-		return false;
-	}
 
 	@SuppressWarnings("deprecation")
 	private void movedig(Block b, BlockFace face, Block block) {
@@ -830,9 +766,8 @@ public abstract class ProgrammableAndroid extends SlimefunItem {
 								
 								block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, block.getType());
 								
-								block.setType(Material.SKULL);
-								block.setData((byte) 1);
-			
+								block.setType(Material.PLAYER_HEAD);
+
 								Skull skull = (Skull) block.getState();
 								skull.setRotation(face);
 								skull.update(true, false);
@@ -848,9 +783,8 @@ public abstract class ProgrammableAndroid extends SlimefunItem {
 					if (fits(b, items)) {
 						pushItems(b, items);
 						block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, block.getType());
-						block.setType(Material.SKULL);
-						block.setData((byte) 1);
-	
+						block.setType(Material.PLAYER_HEAD);
+
 						Skull skull = (Skull) block.getState();
 						skull.setRotation(face);
 						skull.update(true, false);
@@ -872,70 +806,87 @@ public abstract class ProgrammableAndroid extends SlimefunItem {
 		}
 	}
 
-    @SuppressWarnings("deprecation")
+	private boolean isFullGrown(Block block){
+		org.bukkit.block.data.Ageable ageable = ((org.bukkit.block.data.Ageable)block.getBlockData());
+		return ageable.getAge() >= ageable.getMaximumAge();
+	}
+
     private void farm(Block b, Block block) {
         switch (block.getType()) {
-            case CROPS: {
-                if (block.getData() >= 7) {
+            case WHEAT: {
+
+                if (isFullGrown(block)) {
                     ItemStack drop = new ItemStack(Material.WHEAT, CSCoreLib.randomizer().nextInt(3) + 1);
                     if (fits(b, drop)) {
                         pushItems(b, drop);
-                        block.setData((byte) 0);
+                        org.bukkit.block.data.Ageable ageable = (org.bukkit.block.data.Ageable)block.getBlockData();
+                        ageable.setAge(0);
+                        block.setBlockData(ageable);
                         block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, block.getType());
                     }
                 }
                 break;
             }
-            case POTATO: {
-                if (block.getData() >= 7) {
-                    ItemStack drop = new ItemStack(Material.POTATO_ITEM, CSCoreLib.randomizer().nextInt(3) + 1);
+            case POTATOES: {
+                if (isFullGrown(block)) {
+                    ItemStack drop = new ItemStack(Material.POTATO, CSCoreLib.randomizer().nextInt(3) + 1);
                     if (fits(b, drop)) {
                         pushItems(b, drop);
-                        block.setData((byte) 0);
+                        org.bukkit.block.data.Ageable ageable = (org.bukkit.block.data.Ageable)block.getBlockData();
+                        ageable.setAge(0);
+                        block.setBlockData(ageable);
                         block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, block.getType());
                     }
                 }
                 break;
             }
-            case CARROT: {
-                if (block.getData() >= 7) {
-                    ItemStack drop = new ItemStack(Material.CARROT_ITEM, CSCoreLib.randomizer().nextInt(3) + 1);
+            case CARROTS: {
+                if (isFullGrown(block)) {
+                    ItemStack drop = new ItemStack(Material.CARROT, CSCoreLib.randomizer().nextInt(3) + 1);
                     if (fits(b, drop)) {
                         pushItems(b, drop);
-                        block.setData((byte) 0);
+                        org.bukkit.block.data.Ageable ageable = (org.bukkit.block.data.Ageable)block.getBlockData();
+                        ageable.setAge(0);
+                        block.setBlockData(ageable);
                         block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, block.getType());
                     }
                 }
                 break;
             }
-            case BEETROOT_BLOCK: {
-                if (block.getData() >= 3) {
+			case BEETROOTS: {
+                if (isFullGrown(block)) {
                     ItemStack drop = new ItemStack(Material.BEETROOT, CSCoreLib.randomizer().nextInt(3) + 1);
                     if (fits(b, drop)) {
                         pushItems(b, drop);
-                        block.setData((byte) 0);
+                        org.bukkit.block.data.Ageable ageable = (org.bukkit.block.data.Ageable)block.getBlockData();
+                        ageable.setAge(0);
+                        block.setBlockData(ageable);
                         block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, block.getType());
                     }
                 }
                 break;
             }
             case COCOA: {
-                if (block.getData() >= 8) {
-                    ItemStack drop = new MaterialData(Material.INK_SACK, (byte) 3).toItemStack(CSCoreLib.randomizer().nextInt(3) + 1);
+                if (isFullGrown(block)) {
+                    ItemStack drop = new ItemStack(Material.COCOA_BEANS, CSCoreLib.randomizer().nextInt(3) + 1);
                     if (fits(b, drop)) {
                         pushItems(b, drop);
-                        block.setData((byte) (block.getData() - 8));
+                        org.bukkit.block.data.Ageable ageable = (org.bukkit.block.data.Ageable)block.getBlockData();
+                        ageable.setAge(0);
+                        block.setBlockData(ageable);
                         block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, block.getType());
                     }
                 }
                 break;
             }
-            case NETHER_WARTS: {
-                if (block.getData() >= 3) {
-                    ItemStack drop = new ItemStack(Material.NETHER_STALK, CSCoreLib.randomizer().nextInt(3) + 1);
+			case NETHER_WART: {
+                if (isFullGrown(block)) {
+                    ItemStack drop = new ItemStack(Material.NETHER_WART, CSCoreLib.randomizer().nextInt(3) + 1);
                     if (fits(b, drop)) {
                         pushItems(b, drop);
-                        block.setData((byte) 0);
+                        org.bukkit.block.data.Ageable ageable = (org.bukkit.block.data.Ageable)block.getBlockData();
+                        ageable.setAge(0);
+                        block.setBlockData(ageable);
                         block.getWorld().playEffect(block.getLocation(), Effect.STEP_SOUND, block.getType());
                     }
                 }
@@ -957,10 +908,9 @@ public abstract class ProgrammableAndroid extends SlimefunItem {
         }
     }
 
-	@SuppressWarnings("deprecation")
 	private void constructMenu(BlockMenuPreset preset) throws Exception {
 		for (int i: border) {
-			preset.addItem(i, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte) 7), " "),
+			preset.addItem(i, new CustomItem(new ItemStack(Material.GRAY_STAINED_GLASS_PANE), " "),
 			new MenuClickHandler() {
 
 				@Override
@@ -971,7 +921,7 @@ public abstract class ProgrammableAndroid extends SlimefunItem {
 			});
 		}
 		for (int i: border_out) {
-			preset.addItem(i, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte) 1), " "),
+			preset.addItem(i, new CustomItem(new ItemStack(Material.ORANGE_STAINED_GLASS_PANE), " "),
 			new MenuClickHandler() {
 
 				@Override
@@ -1182,7 +1132,6 @@ public abstract class ProgrammableAndroid extends SlimefunItem {
 		menu.open(p);
 	}
 
-	@SuppressWarnings("deprecation")
 	private void openScriptDownloader(final Player p, final Block b, final int page) throws Exception {
 		final ChestMenu menu = new ChestMenu("Slimefun Guide");
 
@@ -1190,7 +1139,7 @@ public abstract class ProgrammableAndroid extends SlimefunItem {
 
 			@Override
 			public void onOpen(Player p) {
-				p.playSound(p.getLocation(), Sound.BLOCK_NOTE_HAT, 0.7F, 0.7F);
+				p.playSound(p.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 0.7F, 0.7F);
 			}
 		});
 
@@ -1200,7 +1149,7 @@ public abstract class ProgrammableAndroid extends SlimefunItem {
 		final int pages = (scripts.size() / 45) + 1;
 
 		for (int i = 45; i < 54; i++) {
-			menu.addItem(i, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte) 7), " "));
+			menu.addItem(i, new CustomItem(new ItemStack(Material.GRAY_STAINED_GLASS_PANE), " "));
 			menu.addMenuClickHandler(i, new MenuClickHandler() {
 
 				@Override
@@ -1210,7 +1159,7 @@ public abstract class ProgrammableAndroid extends SlimefunItem {
 			});
 		}
 
-		menu.addItem(46, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte) 5), "&r\u21E6 Previous Page", "", "&7(" + page + " / " + pages + ")"));
+		menu.addItem(46, new CustomItem(new ItemStack(Material.LIME_STAINED_GLASS_PANE), "&r\u21E6 Previous Page", "", "&7(" + page + " / " + pages + ")"));
 		menu.addMenuClickHandler(46, new MenuClickHandler() {
 
 			@Override
@@ -1279,7 +1228,7 @@ public abstract class ProgrammableAndroid extends SlimefunItem {
 			}
 		});
 
-		menu.addItem(52, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte) 5), "&rNext Page \u21E8", "", "&7(" + page + " / " + pages + ")"));
+		menu.addItem(52, new CustomItem(new ItemStack(Material.LIME_STAINED_GLASS_PANE), "&rNext Page \u21E8", "", "&7(" + page + " / " + pages + ")"));
 		menu.addMenuClickHandler(52, new MenuClickHandler() {
 
 			@Override
@@ -1404,101 +1353,22 @@ public abstract class ProgrammableAndroid extends SlimefunItem {
 		return progress;
 	}
 
-	@SuppressWarnings("deprecation")
 	protected void openScriptComponentEditor(Player p, final Block b, final String script, final int index) throws Exception {
 		ChestMenu menu = new ChestMenu("&eScript Editor");
 
 		final String[] commands = script.split("-");
 
-		menu.addItem(0, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte) 7), " "),
-		new MenuClickHandler() {
+		for (int i = 0; i < 9; i++) {
+			menu.addItem(i, new CustomItem(new ItemStack(Material.GRAY_STAINED_GLASS_PANE), " "),
+			new MenuClickHandler() {
 
-			@Override
-			public boolean onClick(Player arg0, int arg1, ItemStack arg2, ClickAction arg3) {
-				return false;
-			}
-
-		});
-
-		menu.addItem(1, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte) 7), " "),
-		new MenuClickHandler() {
-
-			@Override
-			public boolean onClick(Player arg0, int arg1, ItemStack arg2, ClickAction arg3) {
-				return false;
-			}
-
-		});
-
-		menu.addItem(2, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte) 7), " "),
-		new MenuClickHandler() {
-
-			@Override
-			public boolean onClick(Player arg0, int arg1, ItemStack arg2, ClickAction arg3) {
-				return false;
-			}
-
-		});
-
-		menu.addItem(3, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte) 7), " "),
-		new MenuClickHandler() {
-
-			@Override
-			public boolean onClick(Player arg0, int arg1, ItemStack arg2, ClickAction arg3) {
-				return false;
-			}
-
-		});
-
-		menu.addItem(4, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte) 7), " "),
-		new MenuClickHandler() {
-
-			@Override
-			public boolean onClick(Player arg0, int arg1, ItemStack arg2, ClickAction arg3) {
-				return false;
-			}
-
-		});
-
-		menu.addItem(5, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte) 7), " "),
-		new MenuClickHandler() {
-
-			@Override
-			public boolean onClick(Player arg0, int arg1, ItemStack arg2, ClickAction arg3) {
-				return false;
-			}
-
-		});
-
-		menu.addItem(6, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte) 7), " "),
-		new MenuClickHandler() {
-
-			@Override
-			public boolean onClick(Player arg0, int arg1, ItemStack arg2, ClickAction arg3) {
-				return false;
-			}
-
-		});
-
-		menu.addItem(7, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte) 7), " "),
-		new MenuClickHandler() {
-
-			@Override
-			public boolean onClick(Player arg0, int arg1, ItemStack arg2, ClickAction arg3) {
-				return false;
-			}
-
-		});
-
-		menu.addItem(8, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte) 7), " "),
-		new MenuClickHandler() {
-
-			@Override
-			public boolean onClick(Player arg0, int arg1, ItemStack arg2, ClickAction arg3) {
-				return false;
-			}
-
-		});
+				@Override
+				public boolean onClick(Player arg0, int arg1, ItemStack arg2, ClickAction arg3) {
+					return false;
+				}
+				
+			});
+		}
 
 		menu.addItem(9, new CustomItem(CustomSkull.getItem("eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTYxMzlmZDFjNTY1NGU1NmU5ZTRlMmM4YmU3ZWIyYmQ1YjQ5OWQ2MzM2MTY2NjNmZWVlOTliNzQzNTJhZDY0In19fQ=="), "&rDo nothing"),
 		new MenuClickHandler() {
@@ -1559,7 +1429,7 @@ public abstract class ProgrammableAndroid extends SlimefunItem {
 		int size = BlockStorage.getInventory(b).toInventory().getSize();
 		Inventory inv = Bukkit.createInventory(null, size);
 		for (int i = 0; i < size; i++) {
-			inv.setItem(i, new CustomItem(Material.COMMAND, " &4ALL YOUR PLACEHOLDERS ARE BELONG TO US", 0));
+			inv.setItem(i, new CustomItem(Material.COMMAND_BLOCK, " &4ALL YOUR PLACEHOLDERS ARE BELONG TO US", 0));
 		}
 		for (int slot: getOutputSlots()) {
 			inv.setItem(slot, BlockStorage.getInventory(b).getItemInSlot(slot));

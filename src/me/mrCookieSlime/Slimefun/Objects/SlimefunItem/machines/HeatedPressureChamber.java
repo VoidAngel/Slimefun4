@@ -32,7 +32,6 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.material.MaterialData;
 
 public abstract class HeatedPressureChamber extends AContainer {
 
@@ -94,7 +93,6 @@ public abstract class HeatedPressureChamber extends AContainer {
 		registerRecipe(90, new ItemStack[] {SlimefunItems.PLUTONIUM, SlimefunItems.URANIUM}, new ItemStack[] {SlimefunItems.BOOSTED_URANIUM});
 		registerRecipe(60, new ItemStack[]{SlimefunItems.NETHER_ICE, SlimefunItems.PLUTONIUM}, new ItemStack[]{new CustomItem(SlimefunItems.ENRICHED_NETHER_ICE, 4)});
 		registerRecipe(45, new ItemStack[]{SlimefunItems.ENRICHED_NETHER_ICE}, new ItemStack[]{new CustomItem(SlimefunItems.NETHER_ICE_COOLANT_CELL, 8)});
-		registerRecipe(45, new ItemStack[]{new ItemStack(Material.QUARTZ, 4)}, new ItemStack[]{new ItemStack(Material.QUARTZ_BLOCK, 1)});
 	}
 	
 	public String getInventoryTitle() {
@@ -161,7 +159,7 @@ public abstract class HeatedPressureChamber extends AContainer {
 				else progress.put(b, timeleft - 1);
 			}
 			else {
-				BlockStorage.getInventory(b).replaceExistingItem(22, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte) 15), " "));
+				BlockStorage.getInventory(b).replaceExistingItem(22, new CustomItem(new ItemStack(Material.BLACK_STAINED_GLASS_PANE), " "));
 				pushItems(b, processing.get(b).getOutput());
 				
 				progress.remove(b);

@@ -20,16 +20,13 @@ import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecip
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.mrCookieSlime.Slimefun.api.Slimefun;
 import me.mrCookieSlime.Slimefun.api.energy.ChargableBlock;
-import net.voidrealms.tinkertools.Objects.TinkerTool;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.material.MaterialData;
 
 public class AutoEnchanter extends AContainer {
 	public static int max_emerald_enchantments = 2;
@@ -45,7 +42,7 @@ public class AutoEnchanter extends AContainer {
 
 	@Override
 	public ItemStack getProgressBar() {
-		return new ItemStack(Material.GOLD_CHESTPLATE);
+		return new ItemStack(Material.GOLDEN_CHESTPLATE);
 	}
 
 	@Override
@@ -56,7 +53,6 @@ public class AutoEnchanter extends AContainer {
 		return 9;
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	protected void tick(Block b) {
 		if (isProcessing(b)) {
@@ -83,7 +79,7 @@ public class AutoEnchanter extends AContainer {
 				else progress.put(b, timeleft - 1);
 			}
 			else {
-				BlockStorage.getInventory(b).replaceExistingItem(22, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte) 15), " "));
+				BlockStorage.getInventory(b).replaceExistingItem(22, new CustomItem(new ItemStack(Material.BLACK_STAINED_GLASS_PANE), " "));
 				pushItems(b, processing.get(b).getOutput());
 
 				progress.remove(b);
@@ -103,8 +99,6 @@ public class AutoEnchanter extends AContainer {
 				
 				// Enchant
 				if (item != null && item.getType() == Material.ENCHANTED_BOOK && target != null) {
-					if (Bukkit.getPluginManager().isPluginEnabled("TinkerTools") && TinkerTool.isTinkerTool(target)) return;
-					if (Bukkit.getPluginManager().isPluginEnabled("Voiderium") && (SlimefunItem.getByItem(target) != null && SlimefunItem.getByItem(target).getName().contains("VOIDERIUM"))) return;
 					Map<Enchantment, Integer> enchantments = new HashMap<Enchantment, Integer>();
 					Set<ItemEnchantment> enchantments2 = new HashSet<ItemEnchantment>();
 					int amount = 0;

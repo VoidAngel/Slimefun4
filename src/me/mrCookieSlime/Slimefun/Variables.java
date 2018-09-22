@@ -25,11 +25,6 @@ public class Variables {
 	public static Map<UUID, List<ItemStack>> soulbound = new HashMap<UUID, List<ItemStack>>();
 	public static List<UUID> blocks = new ArrayList<UUID>();
 	public static List<UUID> cancelPlace = new ArrayList<UUID>();
-	public static List<UUID> spawnerBreakConfirm = new ArrayList<UUID>();
 	public static Map<UUID, ItemStack> arrows = new HashMap<UUID, ItemStack>();
-	public static Map<Location, Boolean> cargoLore = new HashMap<Location, Boolean>();
-	public static Map<Location, Boolean> cargoDurability = new HashMap<Location, Boolean>();
-	public static Map<Location, String> cargoFilterType = new HashMap<Location, String>();
-	public static Map<UUID, String> dialogueCooldown = new HashMap<UUID, String>();
-	
+
 }

@@ -33,7 +33,7 @@ public class FurnaceListener implements Listener {
 		if (BlockStorage.check(e.getBlock()) != null && BlockStorage.check(e.getBlock()) instanceof EnhancedFurnace) {
 			EnhancedFurnace furnace = (EnhancedFurnace) BlockStorage.check(e.getBlock());
 			Furnace f = (Furnace) e.getBlock().getState();
-			int amount = canApplyFortune(f.getInventory().getSmelting()) ? furnace.getOutput(): 1;
+			int amount = f.getInventory().getSmelting().getType().toString().endsWith("_ORE") ? furnace.getOutput(): 1;
 			ItemStack output = RecipeCalculator.getSmeltedOutput(f.getInventory().getSmelting().getType());
 			ItemStack result = f.getInventory().getResult();
 			if (result != null) result = result.clone();
@@ -43,32 +43,4 @@ public class FurnaceListener implements Listener {
 		}
 	}
 
-	public boolean canApplyFortune(ItemStack item)
-	{
-		switch(item.getType())
-		{
-		case COBBLESTONE:
-		case NETHERRACK:
-		case COAL_ORE:
-		case IRON_ORE:
-		case GOLD_ORE:
-		case REDSTONE_ORE:
-		case LAPIS_ORE:
-		case DIAMOND_ORE:
-		case EMERALD_ORE:
-		case SAND:
-		case LOG:
-		case LOG_2:
-		case CLAY:
-		case PORK:
-		case RAW_BEEF:
-		case RAW_FISH:
-		case POTATO:
-		case RAW_CHICKEN:
-		case MUTTON:
-		case RABBIT:
-		case QUARTZ_ORE: return true;
-		default: return false;
-		}
-	}
 }

@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import me.mrCookieSlime.CSCoreLibPlugin.general.World.CustomSkull;
 import me.mrCookieSlime.Slimefun.SlimefunStartup;
 import me.mrCookieSlime.Slimefun.AncientAltar.AltarRecipe;
 import me.mrCookieSlime.Slimefun.Lists.RecipeType;
@@ -34,7 +33,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SkullMeta;
 
 public class SlimefunItem {
 	
@@ -43,7 +41,6 @@ public class SlimefunItem {
 	public static Map<String, URID> map_id = new HashMap<String, URID>();
 	public static List<ItemStack> radioactive = new ArrayList<ItemStack>();
 	public static int vanilla = 0;
-	public static Map<String, String> map_texture = new HashMap<String, String>();
 	public static Set<String> tickers = new HashSet<String>();
 	
 	public static List<SlimefunItem> all = new ArrayList<SlimefunItem>();
@@ -225,8 +222,7 @@ public class SlimefunItem {
 	public void register(boolean slimefun) {
 		this.addon = !slimefun;
 		try {
-			if (map_id.containsKey(this.id)) id = id + "_2";
-			if (map_id.containsKey(this.id)) id = id.replace("_2", "_3");//throw new IllegalArgumentException("ID \"" + this.id + "\" already exists");
+			if (map_id.containsKey(this.id)) throw new IllegalArgumentException("ID \"" + this.id + "\" already exists");
 			if (this.recipe.length < 9) this.recipe = new ItemStack[] {null, null, null, null, null, null, null, null, null};
 			all.add(this);
 			
@@ -265,8 +261,6 @@ public class SlimefunItem {
 				items.add(this);
 				if (slimefun) vanilla++;
 				map_id.put(this.id, this.urid);
-				if(this.getItem().hasItemMeta() && this.getItem().getItemMeta() instanceof SkullMeta && !map_texture.containsKey(CustomSkull.getTexture(this.item)))
-					map_texture.put(CustomSkull.getTexture(this.item), this.id);
 				this.create();
 				for (ItemHandler handler: itemhandlers) {
 					Set<ItemHandler> handlerset = getHandlers(handler.toCodename());
@@ -336,6 +330,8 @@ public class SlimefunItem {
 	
 	public static SlimefunItem getByItem(ItemStack item) {
 		if (item == null) return null;		
+		if (SlimefunManager.isItemSimiliar(item, SlimefunItems.BROKEN_SPAWNER, false)) return getByID("BROKEN_SPAWNER");
+		if (SlimefunManager.isItemSimiliar(item, SlimefunItems.REPAIRED_SPAWNER, false)) return getByID("REINFORCED_SPAWNER");
 		for (SlimefunItem sfi: items) {
 			if (sfi instanceof ChargableItem && SlimefunManager.isItemSimiliar(item, sfi.getItem(), false)) return sfi;
 			else if (sfi instanceof DamagableChargableItem && SlimefunManager.isItemSimiliar(item, sfi.getItem(), false)) return sfi;

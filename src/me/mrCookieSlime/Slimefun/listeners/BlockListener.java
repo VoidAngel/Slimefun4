@@ -21,7 +21,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
@@ -35,16 +34,14 @@ public class BlockListener implements Listener {
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
 	
-	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onBlockFall(EntityChangeBlockEvent event) {
 		if (event.getEntity() instanceof FallingBlock) {
 			if (BlockStorage.hasBlockInfo(event.getBlock())) {
-				BlockStorage.clearBlockInfo(event.getBlock());
 				event.setCancelled(true);
 				FallingBlock fb = (FallingBlock) event.getEntity();
 				if (fb.getDropItem()) {
-					fb.getWorld().dropItemNaturally(fb.getLocation(), new ItemStack(fb.getMaterial(), 1, fb.getMaterial() == Material.ANVIL ? 0 : fb.getBlockData()));
+					fb.getWorld().dropItemNaturally(fb.getLocation(), new ItemStack(fb.getBlockData().getMaterial(), 1));
 				}
 			}
 		}
@@ -58,7 +55,6 @@ public class BlockListener implements Listener {
 				return;
 			}
 			else if(b.getRelative(e.getDirection()) == null && BlockStorage.hasBlockInfo(b.getRelative(e.getDirection()))) {
-				BlockStorage.clearBlockInfo(b.getRelative(e.getDirection()));
 				e.setCancelled(true);
 				return;
 			}
@@ -74,7 +70,6 @@ public class BlockListener implements Listener {
 					return;
 				}
 				else if(b.getRelative(e.getDirection()) == null && BlockStorage.hasBlockInfo(b.getRelative(e.getDirection()))) {
-					BlockStorage.clearBlockInfo(b.getRelative(e.getDirection()));
 					e.setCancelled(true);
 					return;
 				}
@@ -159,12 +154,4 @@ public class BlockListener implements Listener {
 			}
 		}
 	}
-	
-    @EventHandler
-    public void onFireSpread(BlockBurnEvent e) {
-        if (e.getBlock() == null) return;
-
-        String id = BlockStorage.checkID(e.getBlock());
-        if (id != null && id.startsWith("BARREL_")) e.setCancelled(true);
-    }
 }

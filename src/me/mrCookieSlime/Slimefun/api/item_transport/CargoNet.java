@@ -15,12 +15,12 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.Directional;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.material.MaterialData;
 
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu.MenuClickHandler;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ClickAction;
@@ -48,7 +48,7 @@ public class CargoNet extends Network {
 	// Chest Terminal Stuff
 	private static final ChestTerminalSorter sorter = new ChestTerminalSorter();
 	public static final int[] terminal_slots = new int[] {0, 1, 2, 3, 4, 5, 6, 9, 10, 11, 12, 13, 14, 15, 18, 19, 20, 21, 22, 23, 24, 27, 28, 29, 30, 31, 32, 33, 36, 37, 38, 39, 40, 41, 42};
-	private static final ItemStack terminal_noitem_item = new CustomItem(new MaterialData(Material.BARRIER), "&4No Item cached");
+	private static final ItemStack terminal_noitem_item = new CustomItem(new ItemStack(Material.BARRIER), "&4No Item cached");
 	private static final MenuClickHandler terminal_noitem_handler = new MenuClickHandler() {
 
 		@Override
@@ -370,16 +370,15 @@ public class CargoNet extends Network {
 							destinations:
 							for (Location out: outputlist) {
 								Block target = getAttachedBlock(out.getBlock());
-								if (target != null && out.getBlock() != null) {
+								if (target != null) {
 									stack = CargoManager.insert(out.getBlock(), storage, target, stack, -1);
-									//System.out.println("CARGONET 281 "+ out.getBlockX() + " " + target + " " + stack);
 									if (stack == null) break destinations;
 								}
 							}
 						}
 
 						if (stack != null && previousSlot > -1) {
-							if (inputTarget != null && storage.hasUniversalInventory(inputTarget)) {
+							if (storage.hasUniversalInventory(inputTarget)) {
 								UniversalBlockMenu menu = storage.getUniversalInventory(inputTarget);
 								menu.replaceExistingItem(previousSlot, stack);
 							}
@@ -398,7 +397,7 @@ public class CargoNet extends Network {
 						List<StoredItem> items = new ArrayList<StoredItem>();
 						for (Location l: providers) {
 							Block target = getAttachedBlock(l.getBlock());
-							if (target != null && storage.hasUniversalInventory(target)) {
+							if (storage.hasUniversalInventory(target)) {
 								UniversalBlockMenu menu = storage.getUniversalInventory(target);
 								for (int slot: menu.getPreset().getSlotsAccessedByItemTransport(menu, ItemTransportFlow.WITHDRAW, null)) {
 									ItemStack is = menu.getItemInSlot(slot);
@@ -536,20 +535,9 @@ public class CargoNet extends Network {
 		}
 	}
 
-
-	@SuppressWarnings("deprecation")
 	private static Block getAttachedBlock(Block block) {
-		if (block.getData() == 2) {
-			return block.getRelative(BlockFace.SOUTH);
-		}
-		else if (block.getData() == 3) {
-			return block.getRelative(BlockFace.NORTH);
-		}
-		else if (block.getData() == 4) {
-			return block.getRelative(BlockFace.EAST);
-		}
-		else if (block.getData() == 5) {
-			return block.getRelative(BlockFace.WEST);
+		if (block.getBlockData() instanceof Directional) {
+			return block.getRelative(((Directional) block.getBlockData()).getFacing().getOppositeFace());
 		}
 		return null;
 	}

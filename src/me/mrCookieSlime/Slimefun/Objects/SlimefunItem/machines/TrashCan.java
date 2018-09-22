@@ -1,6 +1,5 @@
 package me.mrCookieSlime.Slimefun.Objects.SlimefunItem.machines;
 
-import me.mrCookieSlime.CSCoreLibPlugin.CSCoreLib;
 import me.mrCookieSlime.CSCoreLibPlugin.Configuration.Config;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu.MenuClickHandler;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ClickAction;
@@ -18,7 +17,6 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.MaterialData;
 
 public class TrashCan extends SlimefunItem {
 	
@@ -40,7 +38,7 @@ public class TrashCan extends SlimefunItem {
 
 			@Override
 			public boolean canOpen(Block b, Player p) {
-				return p.hasPermission("slimefun.inventory.bypass") || CSCoreLib.getLib().getProtectionManager().canAccessChest(p.getUniqueId(), b, true);
+				return true;
 			}
 
 			@Override
@@ -51,10 +49,9 @@ public class TrashCan extends SlimefunItem {
 		};
 	}
 	
-	@SuppressWarnings("deprecation")
 	private void constructMenu(BlockMenuPreset preset) {
 		for (int i: border) {
-			preset.addItem(i, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte) 14), " "),
+			preset.addItem(i, new CustomItem(new ItemStack(Material.RED_STAINED_GLASS_PANE), " "),
 			new MenuClickHandler() {
 
 				@Override

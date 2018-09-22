@@ -3,7 +3,6 @@ package me.mrCookieSlime.Slimefun;
 import java.io.File;
 
 import me.mrCookieSlime.Slimefun.listeners.*;
-
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -74,10 +73,6 @@ public class SlimefunStartup extends JavaPlugin {
 	static Config items;
 	static Config whitelist;
 	static Config config;
-	public static boolean aSkyBlock;
-	public static boolean useWhitelist;
-	
-	private SoundMufflerListener soundMufflerListener;
 
 	public static TickerTask ticker;
 
@@ -86,10 +81,9 @@ public class SlimefunStartup extends JavaPlugin {
 	private boolean clearlag = false;
 	private boolean exoticGarden = false;
 	private boolean coreProtect = false;
-	private boolean protocolLib = false;
 
 	// Supported Versions of Minecraft
-	final String[] supported = {"v1_9_", "v1_10_", "v1_11_", "v1_12_"};
+	final String[] supported = {"v1_13_"};
 	
 	@SuppressWarnings("deprecation")
 	@Override
@@ -140,7 +134,6 @@ public class SlimefunStartup extends JavaPlugin {
 			System.out.println("[Slimefun] Loading Config...");
 
 			utils = new PluginUtils(this);
-			utils.setupMetrics();
 			utils.setupConfig();
 
 			// Loading all extra configs
@@ -150,6 +143,7 @@ public class SlimefunStartup extends JavaPlugin {
 
 			// Init Config, Updater, Metrics and messages.yml
 			utils.setupUpdater(53485, getFile());
+			utils.setupMetrics();
 			utils.setupLocalization();
 			config = utils.getConfig();
 			Messages.local = utils.getLocalization();
@@ -187,7 +181,6 @@ public class SlimefunStartup extends JavaPlugin {
 			MiscSetup.setupMisc();
 
 			BlockStorage.info_delay = config.getInt("URID.info-delay");
-			useWhitelist = config.getBoolean("options.use-whitelist");
 
 			System.out.println("[Slimefun] Loading World Generators...");
 
@@ -212,8 +205,7 @@ public class SlimefunStartup extends JavaPlugin {
 			new TeleporterListener(this);
 			new AndroidKillingListener(this);
 			new NetworkListener(this);
-			if (currentVersion.startsWith("v1_12_")) new ItemPickupListener_1_12(this);
-			else new ItemPickupListener(this);
+			new ItemPickupListener(this);
 
 			// Toggleable Listeners for performance
 			if (config.getBoolean("items.talismans")) new TalismanListener(this);
@@ -268,26 +260,22 @@ public class SlimefunStartup extends JavaPlugin {
 
 				@EventHandler
 				public void onDisconnect(PlayerQuitEvent e) {
-					if (SlimefunGuide.history.containsKey(e.getPlayer().getUniqueId())) SlimefunGuide.history.remove(e.getPlayer().getUniqueId());
+					SlimefunGuide.history.remove(e.getPlayer().getUniqueId());
 				}
 
 			}, this);
 
 			// Initiating various Stuff and all Items with a slightly delay (0ms after the Server finished loading)
-			getServer().getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
-				@Override
-				public void run() {
-					Slimefun.emeraldenchants = getServer().getPluginManager().isPluginEnabled("EmeraldEnchants");
-					Slimefun.askyblock = getServer().getPluginManager().isPluginEnabled("ASkyBlock");
-					SlimefunGuide.all_recipes = config.getBoolean("options.show-vanilla-recipes-in-guide");
-					MiscSetup.loadItems();
+			getServer().getScheduler().scheduleSyncDelayedTask(this, () -> {
+				Slimefun.emeraldenchants = getServer().getPluginManager().isPluginEnabled("EmeraldEnchants");
+				SlimefunGuide.all_recipes = config.getBoolean("options.show-vanilla-recipes-in-guide");
+				MiscSetup.loadItems();
 
-					for (World world: Bukkit.getWorlds()) {
-						new BlockStorage(world);
-					}
-
-					if (SlimefunItem.getByID("ANCIENT_ALTAR") != null) new AncientAltarListener((SlimefunStartup) instance);
+				for (World world: Bukkit.getWorlds()) {
+					new BlockStorage(world);
 				}
+
+				if (SlimefunItem.getByID("ANCIENT_ALTAR") != null) new AncientAltarListener((SlimefunStartup) instance);
 			}, 0);
 
 			// WorldEdit Hook to clear Slimefun Data upon //set 0 //cut or any other equivalent
@@ -307,53 +295,49 @@ public class SlimefunStartup extends JavaPlugin {
 
 			// Armor Update Task
 			if (config.getBoolean("options.enable-armor-effects")) {
-				getServer().getScheduler().runTaskTimer(this, new Runnable() {
-
-					@Override
-					public void run() {
-						for (Player p: Bukkit.getOnlinePlayers()) {
-							for (ItemStack armor: p.getInventory().getArmorContents()) {
-								if (armor != null) {
-									if (Slimefun.hasUnlocked(p, armor, true)) {
-										if (SlimefunItem.getByItem(armor) instanceof SlimefunArmorPiece) {
-											for (PotionEffect effect: ((SlimefunArmorPiece) SlimefunItem.getByItem(armor)).getEffects()) {
-												p.removePotionEffect(effect.getType());
-												p.addPotionEffect(effect);
-											}
+				getServer().getScheduler().runTaskTimer(this, () -> {
+					for (Player p: Bukkit.getOnlinePlayers()) {
+						for (ItemStack armor: p.getInventory().getArmorContents()) {
+							if (armor != null) {
+								if (Slimefun.hasUnlocked(p, armor, true)) {
+									if (SlimefunItem.getByItem(armor) instanceof SlimefunArmorPiece) {
+										for (PotionEffect effect: ((SlimefunArmorPiece) SlimefunItem.getByItem(armor)).getEffects()) {
+											p.removePotionEffect(effect.getType());
+											p.addPotionEffect(effect);
 										}
-										if (SlimefunManager.isItemSimiliar(armor, SlimefunItem.getItem("SOLAR_HELMET"), false)) {
-											if (p.getWorld().getTime() < 12300 || p.getWorld().getTime() > 23850) {
-												if (p.getEyeLocation().getBlock().getLightFromSky() == 15) {
-													ItemEnergy.chargeInventory(p, Float.valueOf(String.valueOf(Slimefun.getItemValue("SOLAR_HELMET", "charge-amount"))));
-												}
+									}
+									if (SlimefunManager.isItemSimiliar(armor, SlimefunItem.getItem("SOLAR_HELMET"), false)) {
+										if (p.getWorld().getTime() < 12300 || p.getWorld().getTime() > 23850) {
+											if (p.getEyeLocation().getBlock().getLightFromSky() == 15) {
+												ItemEnergy.chargeInventory(p, Float.valueOf(String.valueOf(Slimefun.getItemValue("SOLAR_HELMET", "charge-amount"))));
 											}
 										}
 									}
 								}
 							}
+						}
 
-							for (ItemStack radioactive: SlimefunItem.radioactive) {
-								if (p.getInventory().containsAtLeast(radioactive, 1) || SlimefunManager.isItemSimiliar(p.getInventory().getItemInOffHand(), radioactive, true)) {
-									// Check if player is wearing the hazmat suit
-									// If so, break the loop
-									if (SlimefunManager.isItemSimiliar(SlimefunItems.SCUBA_HELMET, p.getInventory().getHelmet(), true) &&
-										SlimefunManager.isItemSimiliar(SlimefunItems.HAZMATSUIT_CHESTPLATE, p.getInventory().getChestplate(), true) &&
-										SlimefunManager.isItemSimiliar(SlimefunItems.HAZMATSUIT_LEGGINGS, p.getInventory().getLeggings(), true) &&
-										SlimefunManager.isItemSimiliar(SlimefunItems.RUBBER_BOOTS, p.getInventory().getBoots(), true)) {
-										break;
-									}
+						for (ItemStack radioactive: SlimefunItem.radioactive) {
+							if (p.getInventory().containsAtLeast(radioactive, 1) || SlimefunManager.isItemSimiliar(p.getInventory().getItemInOffHand(), radioactive, true)) {
+								// Check if player is wearing the hazmat suit
+								// If so, break the loop
+								if (SlimefunManager.isItemSimiliar(SlimefunItems.SCUBA_HELMET, p.getInventory().getHelmet(), true) &&
+									SlimefunManager.isItemSimiliar(SlimefunItems.HAZMATSUIT_CHESTPLATE, p.getInventory().getChestplate(), true) &&
+									SlimefunManager.isItemSimiliar(SlimefunItems.HAZMATSUIT_LEGGINGS, p.getInventory().getLeggings(), true) &&
+									SlimefunManager.isItemSimiliar(SlimefunItems.RUBBER_BOOTS, p.getInventory().getBoots(), true)) {
+									break;
+								}
 
-									// If the item is enabled in the world, then make radioactivity do its job
-									if (Slimefun.isEnabled(p, radioactive, false)) {
-										p.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 400, 3));
-										p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 400, 3));
-										p.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 400, 3));
-										p.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 400, 3));
-										p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 400, 1));
-										p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 400, 1));
-										p.setFireTicks(400);
-										break; // Break the loop to save some calculations
-									}
+								// If the item is enabled in the world, then make radioactivity do its job
+								if (Slimefun.isEnabled(p, radioactive, false)) {
+									p.addPotionEffect(new PotionEffect(PotionEffectType.WITHER, 400, 3));
+									p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, 400, 3));
+									p.addPotionEffect(new PotionEffect(PotionEffectType.CONFUSION, 400, 3));
+									p.addPotionEffect(new PotionEffect(PotionEffectType.WEAKNESS, 400, 3));
+									p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, 400, 1));
+									p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW_DIGGING, 400, 1));
+									p.setFireTicks(400);
+									break; // Break the loop to save some calculations
 								}
 							}
 						}
@@ -377,21 +361,13 @@ public class SlimefunStartup extends JavaPlugin {
 				}
 			}, 80L, 60 * 60 * 20L);
 			
-
-			
 			// Hooray!
 			System.out.println("[Slimefun] Finished!");
 
 			clearlag = getServer().getPluginManager().isPluginEnabled("ClearLag");
 
 			coreProtect = getServer().getPluginManager().isPluginEnabled("CoreProtect");
-			
-			protocolLib = getServer().getPluginManager().isPluginEnabled("ProtocolLib");
-			
-	        if (isProtocolLibInstalled()) {
-	            soundMufflerListener = new SoundMufflerListener(this);
-	            soundMufflerListener.start();
-	        }
+
             Bukkit.getScheduler().scheduleSyncDelayedTask(this, new BukkitRunnable() {
                 @Override
                 public void run() {
@@ -464,7 +440,6 @@ public class SlimefunStartup extends JavaPlugin {
 		Variables.altarinuse = null;
 		Variables.enchanting = null;
 		Variables.backpack = null;
-		Variables.altarinuse = null;
 		Variables.soulbound = null;
 		Variables.blocks = null;
 		Variables.cancelPlace = null;
@@ -538,11 +513,7 @@ public class SlimefunStartup extends JavaPlugin {
 	public boolean isExoticGardenInstalled () {
 		return exoticGarden;
 	}
-	
-    private boolean isProtocolLibInstalled() {
-    	return protocolLib;
-    }
-    
+
 	public boolean isCoreProtectInstalled() {
 		return coreProtect;
 	}
@@ -550,6 +521,4 @@ public class SlimefunStartup extends JavaPlugin {
 	public CoreProtectAPI getCoreProtectAPI() {
 		return coreProtectAPI;
 	}
-	
-
 }

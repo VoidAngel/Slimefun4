@@ -4,14 +4,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.Skull;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Item;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -21,14 +17,11 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.onikur.changebackitem.ChangeBackItem;
-
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.Item.CustomItem;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.Item.SkullItem;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Particles.FireworkShow;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Player.PlayerInventory;
 import me.mrCookieSlime.CSCoreLibPlugin.general.String.StringUtils;
-import me.mrCookieSlime.CSCoreLibPlugin.general.World.CustomSkull;
 import me.mrCookieSlime.Slimefun.SlimefunStartup;
 import me.mrCookieSlime.Slimefun.Variables;
 import me.mrCookieSlime.Slimefun.Lists.SlimefunItems;
@@ -52,21 +45,13 @@ public class ToolListener implements Listener {
 	
 	@EventHandler(priority=EventPriority.MONITOR, ignoreCancelled = true)
 	public void onBlockRegister(BlockPlaceEvent e) {
-		if (!e.isCancelled() && BlockStorage.hasBlockInfo(e.getBlock().getLocation())) {
+		if (BlockStorage.hasBlockInfo(e.getBlock())) {
 			e.setCancelled(true);
-			System.out.println(BlockStorage.checkID(e.getBlock()) + " block cleared at " + e.getBlock().getLocation().toString());
-			BlockStorage.clearBlockInfo(e.getBlock().getLocation());
 			return;
 		}
 		ItemStack item = e.getItemInHand();
-		if (item != null && item.getType() == Material.INK_SACK) return;
+		if (item != null && item.getType() == Material.INK_SAC) return;
 		SlimefunItem sfItem = SlimefunItem.getByItem(item);
-		if (item.getType() == Material.COAL_BLOCK && item.hasItemMeta()
-				&& item.getItemMeta().hasDisplayName() && item.getItemMeta().getDisplayName().equals(ChatColor.translateAlternateColorCodes('&', "&rCharcoal Block"))) 
-		{
-			e.setCancelled(true);
-			return;
-		}
 		if (sfItem != null && !(sfItem instanceof NotPlaceable)){
 			BlockStorage.addBlockInfo(e.getBlock(), "id", sfItem.getID(), true);
 			if (SlimefunItem.blockhandler.containsKey(sfItem.getID())) {
@@ -82,11 +67,6 @@ public class ToolListener implements Listener {
 	
 	@EventHandler
 	public void onBlockPlace(BlockPlaceEvent e) {
-		if (!e.isCancelled() && BlockStorage.hasBlockInfo(e.getBlock().getLocation())) {
-			System.out.println(BlockStorage.checkID(e.getBlock()) + " block cleared at " + e.getBlock().getLocation().toString());
-			BlockStorage.clearBlockInfo(e.getBlock().getLocation());
-			return;
-		}
 		ItemStack item = e.getItemInHand();
 		
 		if (Variables.cancelPlace.contains(e.getPlayer().getUniqueId())) {
@@ -234,38 +214,12 @@ public class ToolListener implements Listener {
 				if (((BlockBreakHandler) handler).onBlockBreak(e, item, fortune, drops)) break;
 			}
 		}
-		else if (sfItem == null)
-		{
-			Block b = e.getBlock();
-			if(!(ChangeBackItem.get().isValidBlockForRestoreItem(b) && b.hasMetadata("ChangeBackItem"))) {
-				if(b.getType() == Material.SKULL) {
-					Skull skull = (Skull) b.getState();
-					if(skull.hasOwner() && skull.getOwningPlayer().getName().equalsIgnoreCase("cscorelib")) {
-						String texture = "";
-						try {
-							texture = CustomSkull.getTexture(b);
-						} catch (Exception e1) {
-							e1.printStackTrace();
-						}
-						if(!BlockStorage.hasBlockInfo(b.getLocation()) && SlimefunItem.map_texture.containsKey(texture)) {
-							SlimefunItem sfItem2 = SlimefunItem.getByID(SlimefunItem.map_texture.get(texture));
-							if (sfItem2 != null && !(sfItem2 instanceof NotPlaceable)){
-								drops.add(sfItem2.getItem());
-								System.out.println("Slimefun Fix Break > " + sfItem2.getID() + " block fixed for player " + e.getPlayer().getName());	
-							}
-						}
-					}
-				}
-			}
-		}
 		
 		if (!drops.isEmpty()) {
 			e.getBlock().setType(Material.AIR);
 			for (ItemStack drop: drops) {
 				if (drop != null) {
-					Item i = e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), drop);
-					if(sfItem != null || drop.getType() == Material.SKULL_ITEM)
-						i.setPickupDelay(0);
+					e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), drop);
 				}
 			}
 		}
@@ -279,18 +233,19 @@ public class ToolListener implements Listener {
 			SlimefunItem item = BlockStorage.check(block);
     		if (item != null) {
     			blocks.remove();
-    			if (!(e.getEntity().getType() == EntityType.CREEPER) && !item.getID().equalsIgnoreCase("HARDENED_GLASS") && !item.getID().equalsIgnoreCase("WITHER_PROOF_OBSIDIAN") && !item.getID().equalsIgnoreCase("WITHER_PROOF_GLASS") && !item.getID().equalsIgnoreCase("FORCEFIELD_PROJECTOR") && !item.getID().equalsIgnoreCase("FORCEFIELD_RELAY")) {
+    			if (!item.getID().equalsIgnoreCase("HARDENED_GLASS") && !item.getID().equalsIgnoreCase("WITHER_PROOF_OBSIDIAN") && !item.getID().equalsIgnoreCase("WITHER_PROOF_GLASS") && !item.getID().equalsIgnoreCase("FORCEFIELD_PROJECTOR") && !item.getID().equalsIgnoreCase("FORCEFIELD_RELAY")) {
     				boolean success = true;
     				if (SlimefunItem.blockhandler.containsKey(item.getID())) {
     					success = SlimefunItem.blockhandler.get(item.getID()).onBreak(null, block, item, UnregisterReason.EXPLODE);
     				}
     				if (success) {
-    					BlockStorage.clearBlockInfo(block.getLocation());
+    					BlockStorage.clearBlockInfo(block);
         				block.setType(Material.AIR);
     				}
     			}
     		}
 		}
+	    
 	}
 	
 	@EventHandler

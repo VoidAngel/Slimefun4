@@ -1,10 +1,10 @@
 package me.mrCookieSlime.Slimefun.Objects.SlimefunItem.machines;
 
+import me.mrCookieSlime.CSCoreLibPlugin.compatibility.MaterialHelper;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.MaterialData;
 
 import me.mrCookieSlime.CSCoreLibPlugin.CSCoreLib;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu.MenuClickHandler;
@@ -36,7 +36,6 @@ public class CargoCraftingNode extends SlimefunItem {
 				constructMenu(this);
 			}
 
-			@SuppressWarnings("deprecation")
 			@Override
 			public void newInstance(final BlockMenu menu, final Block b) {
 				try {
@@ -53,7 +52,7 @@ public class CargoCraftingNode extends SlimefunItem {
 						}
 					});
 
-					menu.replaceExistingItem(42, new CustomItem(new MaterialData(Material.WOOL, (byte) ((!BlockStorage.hasBlockInfo(b) || BlockStorage.getLocationInfo(b.getLocation(), "frequency") == null) ? 0: (Integer.parseInt(BlockStorage.getLocationInfo(b.getLocation(), "frequency"))))), "&bChannel ID: &3" + (((!BlockStorage.hasBlockInfo(b) || BlockStorage.getLocationInfo(b.getLocation(), "frequency") == null) ? 0: (Integer.parseInt(BlockStorage.getLocationInfo(b.getLocation(), "frequency")))) + 1)));
+					menu.replaceExistingItem(42, new CustomItem(new ItemStack(((!BlockStorage.hasBlockInfo(b) || BlockStorage.getLocationInfo(b.getLocation(), "frequency") == null) ? Material.WHITE_WOOL: MaterialHelper.WoolColours[(Integer.parseInt(BlockStorage.getLocationInfo(b.getLocation(), "frequency")))])), "&bChannel ID: &3" + (((!BlockStorage.hasBlockInfo(b) || BlockStorage.getLocationInfo(b.getLocation(), "frequency") == null) ? 0: (Integer.parseInt(BlockStorage.getLocationInfo(b.getLocation(), "frequency")))) + 1)));
 					menu.addMenuClickHandler(42, new MenuClickHandler() {
 
 						@Override
@@ -119,10 +118,9 @@ public class CargoCraftingNode extends SlimefunItem {
 		});
 	}
 	
-	@SuppressWarnings("deprecation")
 	protected void constructMenu(BlockMenuPreset preset) {
 		for (int i: border) {
-			preset.addItem(i, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte) 9), " "),
+			preset.addItem(i, new CustomItem(new ItemStack(Material.CYAN_STAINED_GLASS_PANE), " "),
 			new MenuClickHandler() {
 
 				@Override
@@ -133,7 +131,7 @@ public class CargoCraftingNode extends SlimefunItem {
 			});
 		}
 
-		preset.addItem(2, new CustomItem(new MaterialData(Material.WORKBENCH), "&eRecipe", "", "&bPut in the Recipe you want to craft"),
+		preset.addItem(2, new CustomItem(new ItemStack(Material.CRAFTING_TABLE), "&eRecipe", "", "&bPut in the Recipe you want to craft"),
 		new MenuClickHandler() {
 
 			@Override

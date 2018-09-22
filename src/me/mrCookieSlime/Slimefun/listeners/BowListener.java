@@ -34,26 +34,15 @@ public class BowListener implements Listener {
 	
 	@EventHandler
 	public void onArrowHit(final ProjectileHitEvent e) {
-		Bukkit.getScheduler().scheduleSyncDelayedTask(SlimefunStartup.instance, new Runnable() {
-			
-			@Override
-			public void run() {
-				if (!e.getEntity().isValid()) return;
-				if (Variables.arrows.containsKey(e.getEntity().getUniqueId())) Variables.arrows.remove(e.getEntity().getUniqueId());
-				if (e.getEntity() instanceof Arrow && e.getEntity().getShooter() instanceof Player) {
-					Arrow arrow = ((Arrow)e.getEntity());
-					if(Variables.remove.containsKey(((Player)arrow.getShooter()).getUniqueId())) {
-						if(!arrow.isDead() && Variables.remove.get(((Player)arrow.getShooter()).getUniqueId())[1].getUniqueId().equals(arrow.getUniqueId())) {
-							handleGrapplingHook(arrow);
-						}
-					}
-				}
-			}
+		Bukkit.getScheduler().scheduleSyncDelayedTask(SlimefunStartup.instance, () -> {
+			if (!e.getEntity().isValid()) return;
+			if (Variables.arrows.containsKey(e.getEntity().getUniqueId())) Variables.arrows.remove(e.getEntity().getUniqueId());
+			if (e.getEntity() instanceof Arrow) handleGrapplingHook((Arrow) e.getEntity());
 		}, 4L);
 	}
 	
-	public static void handleGrapplingHook(Arrow arrow) {
-		if (arrow instanceof Arrow) {
+	private void handleGrapplingHook(Arrow arrow) {
+		if (arrow != null) {
 			if (arrow.getShooter() instanceof Player && Variables.jump.containsKey(((Player) arrow.getShooter()).getUniqueId())) {
 				final Player p = (Player) arrow.getShooter();
 				if (p.getGameMode() != GameMode.CREATIVE && Variables.jump.get(p.getUniqueId())) arrow.getWorld().dropItem(arrow.getLocation(), SlimefunItem.getItem("GRAPPLING_HOOK"));
@@ -66,13 +55,9 @@ public class BowListener implements Listener {
 		    	    	n.remove();
 		    	    }
 		    	    
-		    	    Bukkit.getScheduler().scheduleSyncDelayedTask(SlimefunStartup.instance, new Runnable() {
-						
-						@Override
-						public void run() {
-							Variables.jump.remove(p.getUniqueId());
-							Variables.remove.remove(p.getUniqueId());
-						}
+		    	    Bukkit.getScheduler().scheduleSyncDelayedTask(SlimefunStartup.instance, () -> {
+						Variables.jump.remove(p.getUniqueId());
+						Variables.remove.remove(p.getUniqueId());
 					}, 20L);
 				}
 				else {
@@ -88,23 +73,11 @@ public class BowListener implements Listener {
 		    	    double v_z = (1.0D + 0.08000000000000001D * t) * (arrow.getLocation().getZ() - l.getZ()) / t;
 
 		    	    Vector v = p.getVelocity();
+		    	    
 		    	    v.setX(v_x);
 		    	    v.setY(v_y);
 		    	    v.setZ(v_z);
-
-		            if(v.getX() > 4)
-		            	v.setX(4.0);
-		            else if(v.getX() < -4)
-		            	v.setX(-4.0);
-		            if(v.getY() > 4)
-		            	v.setY(4.0);
-		            else if(v.getY() < -4)
-		            	v.setY(-4.0);
-		            if(v.getZ() > 4)
-		            	v.setZ(4.0);
-		            else if(v.getZ() < -4)
-		            	v.setZ(-4.0);
-
+		    	    
 		    	    p.setVelocity(v);
 		    	    
 		    	    for (Entity n: Variables.remove.get(p.getUniqueId())) {
@@ -134,14 +107,7 @@ public class BowListener implements Listener {
 				 Variables.arrows.remove(e.getDamager().getUniqueId());
 			}
 			
-			if (e.getDamager() instanceof Arrow && ((Arrow)e.getDamager()).getShooter() instanceof Player) {
-				Arrow arrow = (Arrow) e.getDamager();
-				if(Variables.remove.containsKey(((Player)arrow.getShooter()).getUniqueId())) {
-					if(!arrow.isDead() && Variables.remove.get(((Player)arrow.getShooter()).getUniqueId())[1].getUniqueId().equals(arrow.getUniqueId())) {
-						handleGrapplingHook(arrow);
-					}
-				}
-			}
+			handleGrapplingHook((Arrow) e.getDamager());
 		}
 	}
 

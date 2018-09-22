@@ -5,14 +5,12 @@ import java.util.List;
 
 import me.mrCookieSlime.CSCoreLibPlugin.Configuration.Config;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.Item.CustomItem;
-import me.mrCookieSlime.Slimefun.Variables;
 import me.mrCookieSlime.Slimefun.Setup.SlimefunManager;
 import me.mrCookieSlime.Slimefun.Setup.SlimefunManager.DataType;
 import me.mrCookieSlime.Slimefun.api.BlockStorage;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.UniversalBlockMenu;
 
-import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -21,7 +19,6 @@ import org.bukkit.inventory.ItemStack;
 public class CargoManager {
 	
 	public static ItemStack withdraw(Block node, BlockStorage storage, Block target, ItemStack template) {
-		if(target == null) return null;
 		if (storage.hasUniversalInventory(target)) {
 			UniversalBlockMenu menu = storage.getUniversalInventory(target);
 			for (int slot: menu.getPreset().getSlotsAccessedByItemTransport(menu, ItemTransportFlow.WITHDRAW, null)) {
@@ -74,7 +71,6 @@ public class CargoManager {
 	}
 	
 	public static ItemSlot withdraw(Block node, BlockStorage storage, Block target, int index) {
-		if(target == null) return null;
 		if (storage.hasUniversalInventory(target)) {
 			UniversalBlockMenu menu = storage.getUniversalInventory(target);
 			for (int slot: menu.getPreset().getSlotsAccessedByItemTransport(menu, ItemTransportFlow.WITHDRAW, null)) {
@@ -109,7 +105,6 @@ public class CargoManager {
 	}
 	
 	public static ItemStack insert(Block node, BlockStorage storage, Block target, ItemStack stack, int index) {
-		if(target == null) return null;
 		if (!matchesFilter(node, stack, index)) return stack;
 		if (storage.hasUniversalInventory(target)) {
 			UniversalBlockMenu menu = storage.getUniversalInventory(target);
@@ -200,30 +195,13 @@ public class CargoManager {
 		String id = BlockStorage.checkID(block);
 		if (id.equals("CARGO_NODE_OUTPUT")) return true;
 
-		boolean lore = false;
-		boolean data = false;
-		String filterType = "";
-		Location l = block.getLocation();
+		Config blockInfo = BlockStorage.getLocationInfo(block.getLocation()); // Store the returned Config instance to avoid heavy calls
+
 		BlockMenu menu = BlockStorage.getInventory(block.getLocation());
+		boolean lore = blockInfo.getString("filter-lore").equals("true");
+		boolean data = blockInfo.getString("filter-durability").equals("true");
 		
-		if(!(Variables.cargoLore.containsKey(l) && Variables.cargoDurability.containsKey(l) && Variables.cargoFilterType.containsKey(l)))
-		{
-			//System.out.println("USING HEAVY METHOD");
-			Config blockInfo = BlockStorage.getLocationInfo(block.getLocation()); 
-			Variables.cargoLore.put(l, (lore = blockInfo.getString("filter-lore").equals("true")));
-			Variables.cargoDurability.put(l, (data = blockInfo.getString("filter-durability").equals("true")));
-			Variables.cargoFilterType.put(l, (filterType = blockInfo.getString("filter-type")));
-		}
-		else
-		{
-			//System.out.println("USING LIGHT METHOD");
-			lore = Variables.cargoLore.get(l);
-			data = Variables.cargoDurability.get(l);
-			filterType = Variables.cargoFilterType.get(l);
-		}
-
-
-		if (filterType.equals("whitelist")) {
+		if (blockInfo.getString("filter-type").equals("whitelist")) {
 			List<ItemStack> items = new ArrayList<ItemStack>();
 			for (int slot: slots) {
 				ItemStack template = menu.getItemInSlot(slot);

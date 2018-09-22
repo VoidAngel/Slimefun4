@@ -1,17 +1,16 @@
 package me.mrCookieSlime.Slimefun.Objects.SlimefunItem.machines;
 
+import me.mrCookieSlime.CSCoreLibPlugin.compatibility.MaterialHelper;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.MaterialData;
 
 import me.mrCookieSlime.CSCoreLibPlugin.CSCoreLib;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu.MenuClickHandler;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ClickAction;
 import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.Item.CustomItem;
 import me.mrCookieSlime.CSCoreLibPlugin.general.World.CustomSkull;
-import me.mrCookieSlime.Slimefun.Variables;
 import me.mrCookieSlime.Slimefun.Lists.RecipeType;
 import me.mrCookieSlime.Slimefun.Lists.SlimefunItems;
 import me.mrCookieSlime.Slimefun.Objects.Category;
@@ -29,6 +28,7 @@ public class CargoOutputNode extends SlimefunItem {
 	
 	private static final int[] border = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26};
 
+
 	public CargoOutputNode(Category category, ItemStack item, String name, RecipeType recipeType, ItemStack[] recipe, ItemStack recipeOutput) {
 		super(category, item, name, recipeType, recipe, recipeOutput);
 		
@@ -39,7 +39,6 @@ public class CargoOutputNode extends SlimefunItem {
 				constructMenu(this);
 			}
 
-			@SuppressWarnings("deprecation")
 			@Override
 			public void newInstance(final BlockMenu menu, final Block b) {
 				try {
@@ -73,7 +72,7 @@ public class CargoOutputNode extends SlimefunItem {
 						});
 					}
 					else {
-						menu.replaceExistingItem(13, new CustomItem(new MaterialData(Material.WOOL, (byte) channel), "&bChannel ID: &3" + (channel + 1)));
+						menu.replaceExistingItem(13, new CustomItem(new ItemStack(MaterialHelper.WoolColours[channel]), "&bChannel ID: &3" + (channel + 1)));
 						menu.addMenuClickHandler(13, new MenuClickHandler() {
 
 							@Override
@@ -133,18 +132,14 @@ public class CargoOutputNode extends SlimefunItem {
 			
 			@Override
 			public boolean onBreak(Player p, Block b, SlimefunItem item, UnregisterReason reason) {
-				Variables.cargoLore.remove(b.getLocation());
-				Variables.cargoDurability.remove(b.getLocation());
-				Variables.cargoFilterType.remove(b.getLocation());
 				return true;
 			}
 		});
 	}
 	
-	@SuppressWarnings("deprecation")
 	protected void constructMenu(BlockMenuPreset preset) {
 		for (int i: border) {
-			preset.addItem(i, new CustomItem(new MaterialData(Material.STAINED_GLASS_PANE, (byte) 9), " "),
+			preset.addItem(i, new CustomItem(new ItemStack(Material.CYAN_STAINED_GLASS_PANE), " "),
 			new MenuClickHandler() {
 
 				@Override

@@ -1,6 +1,9 @@
-package me.mrCookieSlime.Slimefun.api;
+ package me.mrCookieSlime.Slimefun.api;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,14 +32,12 @@ import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import me.mrCookieSlime.Slimefun.api.inventory.UniversalBlockMenu;
 
 public class BlockStorage {
-
 	private static final String path_blocks = "data-storage/Slimefun/stored-blocks/";
 	private static final String path_chunks = "data-storage/Slimefun/stored-chunks/";
 
 	public static Map<String, BlockStorage> worlds = new HashMap<String, BlockStorage>();
 	public static Map<String, Set<Location>> ticking_chunks = new HashMap<String, Set<Location>>();
 	public static Set<String> loaded_tickers = new HashSet<String>();
-	public static Set<String> loaded_mufflers = new HashSet<String>();
 	
 	private World world;
 	
@@ -93,40 +94,34 @@ public class BlockStorage {
 			try {
 				for (File file: f.listFiles()) {
 					if (file.getName().endsWith(".sfb")) {
-						if(!file.getName().equals("null.sfb")) {
-							if (timestamp + info_delay < System.currentTimeMillis()) {
-								System.out.println("[Slimefun] Loading Blocks... " + Math.round((((done * 100.0f) / total) * 100.0f) / 100.0f) + "% done (\"" + w.getName() + "\")");
-								timestamp = System.currentTimeMillis();
-							}
-							
-							FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
-							for (String key: cfg.getKeys(false)) {
-								Location l = deserializeLocation(key);
-								String chunk_string = locationToChunkString(l);
-								try {
-									totalBlocks++;
-									String json = cfg.getString(key);
-									Config blockInfo = parseBlockInfo(l, json);
-									if (blockInfo == null) continue;
-									storage.put(l, blockInfo);
-									if(file.getName().replace(".sfb", "").toString().equals("SOUND_MUFFLER"))
-										loaded_mufflers.add(key);
-									
-									if (SlimefunItem.isTicking(file.getName().replace(".sfb", ""))) {
-										Set<Location> locations = ticking_chunks.containsKey(chunk_string) ? ticking_chunks.get(chunk_string): new HashSet<Location>();
-										locations.add(l);
-										ticking_chunks.put(chunk_string, locations);
-										if (!loaded_tickers.contains(chunk_string)) loaded_tickers.add(chunk_string);
-									}
-								} catch (Exception x) {
-									System.err.println("[Slimefun] Failed to load " + file.getName() + "(ERR: " + key + ")");
-									x.printStackTrace();
-								}
-							}
-							done++;
+						if (timestamp + info_delay < System.currentTimeMillis()) {
+							System.out.println("[Slimefun] Loading Blocks... " + Math.round((((done * 100.0f) / total) * 100.0f) / 100.0f) + "% done (\"" + w.getName() + "\")");
+							timestamp = System.currentTimeMillis();
 						}
-						else
-							System.out.println("[Slimefun] Skipping file null.sfb!");
+						
+						FileConfiguration cfg = YamlConfiguration.loadConfiguration(file);
+						for (String key: cfg.getKeys(false)) {
+							Location l = deserializeLocation(key);
+							String chunk_string = locationToChunkString(l);
+							try {
+								totalBlocks++;
+								String json = cfg.getString(key);
+								Config blockInfo = parseBlockInfo(l, json);
+								if (blockInfo == null) continue;
+								storage.put(l, blockInfo);
+								
+								if (SlimefunItem.isTicking(file.getName().replace(".sfb", ""))) {
+									Set<Location> locations = ticking_chunks.containsKey(chunk_string) ? ticking_chunks.get(chunk_string): new HashSet<Location>();
+									locations.add(l);
+									ticking_chunks.put(chunk_string, locations);
+									if (!loaded_tickers.contains(chunk_string)) loaded_tickers.add(chunk_string);
+								}
+							} catch (Exception x) {
+								System.err.println("[Slimefun] Failed to load " + file.getName() + "(ERR: " + key + ")");
+								x.printStackTrace();
+							}
+						}
+						done++;
 					}
 				}
 			} finally {
@@ -216,11 +211,19 @@ public class BlockStorage {
 		Map<String, Config> cache = new HashMap<String, Config>(cache_blocks);
 		
 		for (Map.Entry<String, Config> entry: cache.entrySet()) {
-			if(entry.getKey() == null) System.out.println("Saving null key! " + entry.getKey());
 			cache_blocks.remove(entry.getKey());
 			Config cfg = entry.getValue();
-			if (cfg.getKeys().isEmpty()) cfg.getFile().delete();
-			else cfg.save();
+			if (cfg.getKeys().isEmpty()) {
+				cfg.getFile().delete();
+			} else {
+				File tmpFile = new File(cfg.getFile().getParentFile(), cfg.getFile().getName() + ".tmp");
+				cfg.save(tmpFile);
+				try {
+					Files.move(tmpFile.toPath(), cfg.getFile().toPath(), StandardCopyOption.ATOMIC_MOVE);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		
 		Map<Location, BlockMenu> inventories2 = new HashMap<Location, BlockMenu>(inventories);
@@ -293,7 +296,7 @@ public class BlockStorage {
 	}
 
 	public static Config getLocationInfo(Location l) {
-		BlockStorage storage = getStorage(l.getWorld());
+			BlockStorage storage = getStorage(l.getWorld());
 			Config cfg = storage.storage.get(l);
 			return cfg == null ? new BlockInfoConfig() : cfg;
 	}
@@ -332,16 +335,15 @@ public class BlockStorage {
 			return null;
 		}
 	}
-	
-		@SuppressWarnings("unchecked")
-		private static String serializeBlockInfo(Config cfg) {
-			JSONObject json = new JSONObject();
-			for (String key: cfg.getKeys()) {
-				json.put(key, cfg.getString(key));
-			}
-			return json.toJSONString();
+
+	@SuppressWarnings("unchecked")
+	private static String serializeBlockInfo(Config cfg) {
+		JSONObject json = new JSONObject();
+		for (String key: cfg.getKeys()) {
+			json.put(key, cfg.getString(key));
+		}
+		return json.toJSONString();
 	}
-	
 	private static String getJSONData(Chunk chunk) {
 		return map_chunks.get(serializeChunk(chunk));
 	}
@@ -386,17 +388,17 @@ public class BlockStorage {
 		BlockStorage storage = getStorage(l.getWorld());
 		return storage != null && storage.storage.containsKey(l) && getLocationInfo(l, "id") != null;
 	}
-	
+
 	public static void setBlockInfo(Block block, Config cfg, boolean updateTicker) {
 		setBlockInfo(block.getLocation(), cfg, updateTicker);
 	}
-	
+
 	public static void setBlockInfo(Location l, Config cfg, boolean updateTicker) {
 		BlockStorage storage = getStorage(l.getWorld());
-			storage.storage.put(l, cfg);
-			if (BlockMenuPreset.isInventory(cfg.getString("id"))) {
-				if (BlockMenuPreset.isUniversalInventory(cfg.getString("id"))) {
-					if (!universal_inventories.containsKey(cfg.getString("id"))) storage.loadUniversalInventory(BlockMenuPreset.getPreset(cfg.getString("id")));
+		storage.storage.put(l, cfg);
+		if (BlockMenuPreset.isInventory(cfg.getString("id"))) {
+			if (BlockMenuPreset.isUniversalInventory(cfg.getString("id"))) {
+				if (!universal_inventories.containsKey(cfg.getString("id"))) storage.loadUniversalInventory(BlockMenuPreset.getPreset(cfg.getString("id")));
 			}
 			else if (!storage.hasInventory(l)) {
 				File file = new File("data-storage/Slimefun/stored-inventories/" + serializeLocation(l) + ".sfi");

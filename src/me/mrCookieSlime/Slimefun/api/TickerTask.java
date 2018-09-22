@@ -79,11 +79,6 @@ public class TickerTask implements Runnable {
 						if (item != null) {
 							machines++;
 							try {
-								if(item.getID().contains("CAPACITOR")) {
-									if(item.getBlockTicker() == null) {
-										System.out.println("BLOCK TICKER AT " + l + " IS NULL");
-									}
-								}
 								item.getBlockTicker().update();
 								if (item.getBlockTicker().isSynchronized()) {
 									Bukkit.getScheduler().scheduleSyncDelayedTask(SlimefunStartup.instance, new Runnable() {
@@ -98,12 +93,7 @@ public class TickerTask implements Runnable {
 												map_chunk.put(c, (map_chunk.containsKey(c) ? map_chunk.get(c): 0) + 1);
 												map_machine.put(item.getID(), (map_machine.containsKey(item.getID()) ? map_machine.get(item.getID()): 0) + 1);
 												block_timings.put(l, System.currentTimeMillis() - timestamp3);
-											} catch(Exception x) {
-												if(b.getType() == null || b.getType() != item.getItem().getType())
-												{
-													System.out.println("CLEARING UNUSED " + item.getID() + " AT " + l.toString());
-													//BlockStorage.clearBlockInfo(b);
-												}
+											} catch (Exception x) {
 												int errors = 0;
 												if (bugged.containsKey(l)) errors = bugged.get(l);
 												errors++;
@@ -303,7 +293,15 @@ public class TickerTask implements Runnable {
 									System.err.println("[Slimefun] ");
 									
 									BlockStorage._integrated_removeBlockInfo(l, true);
+									
+									Bukkit.getScheduler().scheduleSyncDelayedTask(SlimefunStartup.instance, new Runnable() {
 
+										@Override
+										public void run() {
+											l.getBlock().setType(Material.AIR);
+										}
+										
+									});
 								}
 								else {
 									bugged_blocks.put(l, errors);

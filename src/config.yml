@@ -8,7 +8,6 @@ options:
   prefix: '&a&lSlimefun &7>'
   auto-save-delay-in-minutes: 10
   show-vanilla-recipes-in-guide: true
-  use-whitelist: false
   allow-free-creative-research: true
   emerald-enchantment-limit: 2
   research-unlock-fireworks: true

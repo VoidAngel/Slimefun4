@@ -99,20 +99,6 @@ public class Talisman extends SlimefunItem {
 							}
 							else return false;
 						}
-						else if (p.getInventory().containsAtLeast(((Talisman) talisman).upgrade(), 1)) {
-							if (Slimefun.hasUnlocked(p, ((Talisman) talisman).upgrade(), true)) {
-								if (((Talisman) talisman).isConsumable()) p.getInventory().removeItem(((Talisman) talisman).upgrade());
-								for (PotionEffect effect: ((Talisman) talisman).getEffects()) {
-									p.addPotionEffect(effect);
-								}
-								if (e instanceof Cancellable && ((Talisman) talisman).isEventCancelled()) ((Cancellable) e).setCancelled(true);
-								
-								if (message) Messages.local.sendTranslation(p, "messages.talisman." + ((Talisman) talisman).getSuffix(), true);
-								
-								return true;
-							}
-							else return false;
-						}
 						else if (p.getEnderChest().containsAtLeast(((Talisman) talisman).upgrade(), 1)) {
 							if (Slimefun.hasUnlocked(p, ((Talisman) talisman).upgrade(), true)) {
 								if (((Talisman) talisman).isConsumable()) p.getEnderChest().removeItem(((Talisman) talisman).upgrade());

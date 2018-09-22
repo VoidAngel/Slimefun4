@@ -8,12 +8,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.block.BrewingStand;
-import org.bukkit.block.Dispenser;
 import org.bukkit.block.Hopper;
 import org.bukkit.block.Skull;
-import org.bukkit.craftbukkit.v1_12_R1.block.CraftHopper;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Wither;
@@ -28,7 +25,6 @@ import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemConsumeEvent;
-import org.bukkit.event.world.StructureGrowEvent;
 import org.bukkit.inventory.BrewerInventory;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
@@ -36,8 +32,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import com.onikur.changebackitem.ChangeBackItem;
 
 import me.mrCookieSlime.CSCoreLibPlugin.CSCoreLib;
 import me.mrCookieSlime.CSCoreLibPlugin.Configuration.Variable;
@@ -52,9 +46,7 @@ import me.mrCookieSlime.Slimefun.Lists.SlimefunItems;
 import me.mrCookieSlime.Slimefun.Misc.BookDesign;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.Juice;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.MultiTool;
-import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.SlimefunGadget;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.SlimefunItem;
-import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.Interfaces.NotPlaceable;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.handlers.ItemHandler;
 import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.handlers.ItemInteractionHandler;
 import me.mrCookieSlime.Slimefun.Setup.Messages;
@@ -78,18 +70,13 @@ public class ItemListener implements Listener {
 	 * @param e InventoryMoveItemEvent
 	 * @since 4.1.11
 	 */
-    @EventHandler
-    public void onIgnitionChamberItemMove(InventoryMoveItemEvent e) {
-        if (e.getInitiator().getHolder() instanceof Hopper && e.getDestination().getHolder() instanceof Dispenser) {
-        	if (BlockStorage.check(((Hopper) e.getInitiator().getHolder()).getBlock(), "IGNITION_CHAMBER")) {
-        		CraftHopper chamber = ((CraftHopper) e.getInitiator().getHolder());
-        		BlockFace hopperFace = ((CraftHopper) e.getInitiator().getHolder()).getBlock().getFace(((Dispenser) e.getDestination().getHolder()).getBlock());
-        		org.bukkit.material.Hopper newHopper = new org.bukkit.material.Hopper(hopperFace, false);
-
-        		chamber.setData(newHopper);
-        		e.setCancelled(true);
-        	}
-        }
+	@EventHandler
+	public void onIgnitionChamberItemMove(InventoryMoveItemEvent e) {
+		if (e.getInitiator().getHolder() instanceof Hopper) {
+			if (BlockStorage.check(((Hopper) e.getInitiator().getHolder()).getBlock(), "IGNITION_CHAMBER")) {
+				e.setCancelled(true);
+			}
+		}
 	}
 
 	@SuppressWarnings("deprecation")
@@ -113,7 +100,7 @@ public class ItemListener implements Listener {
 				case RIGHT_CLICK_BLOCK: {
 					if (p.isSneaking()) {
 						Block b = e.getClickedBlock().getRelative(e.getBlockFace());
-						b.setType(Material.SKULL);
+						b.setType(Material.PLAYER_HEAD);
 						try {
 							CustomSkull.setSkull(b, "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTllYjlkYTI2Y2YyZDMzNDEzOTdhN2Y0OTEzYmEzZDM3ZDFhZDEwZWFlMzBhYjI1ZmEzOWNlYjg0YmMifX19");
 						} catch (Exception e1) {
@@ -160,8 +147,6 @@ public class ItemListener implements Listener {
 						p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&6" + BlockStorage.getBlockInfoAsJson(e.getClickedBlock())));
 						p.sendMessage(" ");
 					}
-					else
-						p.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cNo block data found."));
 					break;
 				}
 				default:
@@ -175,24 +160,13 @@ public class ItemListener implements Listener {
 	@SuppressWarnings("deprecation")
 	@EventHandler(priority=EventPriority.NORMAL)
 	public void onRightClick(ItemUseEvent e) {
-		final Player p = e.getPlayer();
-		ItemStack item = e.getItem();
-		ItemStack item2 = e.getPlayer().getItemInHand();
-		if(item2 != null && item2.getType() == Material.SAPLING) {
-			if (e.getClickedBlock() != null) {
-				SlimefunItem machine = BlockStorage.check(e.getClickedBlock());
-				if (machine != null && machine.getID().equals("COMPOSTER")) {
-					for (ItemHandler handler: machine.getHandlers()) {
-						if (((ItemInteractionHandler) handler).onRightClick(e, p, item2)) return;
-					}
-					return;
-				}
-			}
-		}
 		if (e.getParentEvent() != null && !e.getParentEvent().getHand().equals(EquipmentSlot.HAND)) {
 			return;
 		}
-		if(!e.getParentEvent().getHand().equals(EquipmentSlot.HAND)) return;
+
+		final Player p = e.getPlayer();
+		ItemStack item = e.getItem();
+		
 		if (SlimefunManager.isItemSimiliar(item, SlimefunGuide.getItem(BookDesign.BOOK), true)) {
 			if (p.isSneaking()) SlimefunGuide.openSettings(p, item);
 			else SlimefunGuide.openGuide(p, true);
@@ -252,7 +226,7 @@ public class ItemListener implements Listener {
 					else {
 						index++;
 						if (index == modes.size()) index = 0;
-						Messages.local.sendTranslation(p, "messages.mode-change", true, new Variable("%device%", "Multi Tool"), new Variable("%mode%", (String) Slimefun.getItemValue(SlimefunItem.getByItem(tool).getID(), "mode." + modes.get(index) + ".name")));
+						Messages.local.sendTranslation(p, "messages.mode-change", true, new Variable("%device%", "Multi Tool"), new Variable("%mode%", (String) Slimefun.getItemValue(SlimefunItem.getByItem(tool).getName(), "mode." + modes.get(index) + ".name")));
 						Variables.mode.put(p.getUniqueId(), index);
 					}
 				}
@@ -323,12 +297,11 @@ public class ItemListener implements Listener {
 					SlimefunItem sfItem = SlimefunItem.getByItem(item);
 					if (sfItem != null && sfItem instanceof Juice) {
 						// Fix for 1.11 and 1.12 where Saturation potions are no longer working
-						if (!ReflectionUtils.getVersion().startsWith("v1_9_") && !ReflectionUtils.getVersion().startsWith("v1_10_")) {
-							for (PotionEffect effect : ((PotionMeta) item.getItemMeta()).getCustomEffects()) {
-								if (effect.getType().equals(PotionEffectType.SATURATION)) {
-									p.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, effect.getDuration(), effect.getAmplifier()));
-									break;
-								}
+						
+						for (PotionEffect effect : ((PotionMeta) item.getItemMeta()).getCustomEffects()) {
+							if (effect.getType().equals(PotionEffectType.SATURATION)) {
+								p.addPotionEffect(new PotionEffect(PotionEffectType.SATURATION, effect.getDuration(), effect.getAmplifier()));
+								break;
 							}
 						}
 
@@ -385,12 +358,6 @@ public class ItemListener implements Listener {
         		Messages.local.sendTranslation((Player) e.getWhoClicked(), "workbench.not-enhanced", true);
         		break;
         	}
-        	else if(SlimefunManager.isItemSimiliar(item, SlimefunItems.CHARCOAL_BLOCK, false))
-        	{
-           		e.setCancelled(true);
-        		Messages.local.sendTranslation((Player) e.getWhoClicked(), "workbench.not-enhanced", true);
-        		break;
-        	}
         }
     }
 
@@ -422,72 +389,6 @@ public class ItemListener implements Listener {
             }
         }
     }
-	
-	@SuppressWarnings("deprecation")
-	@EventHandler(priority=EventPriority.LOWEST, ignoreCancelled = true)
-    public void onInteract(PlayerInteractEvent e) {
-		if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-			if (!e.getHand().equals(EquipmentSlot.HAND)) return;
-			Block b = e.getClickedBlock();
-			if(b != null) {
-				if(ChangeBackItem.get().isValidBlockForRestoreItem(b)) {
-			        if (b.hasMetadata("ChangeBackItem")) {
-			        	e.setCancelled(true);
-			            final ItemStack itemStack = (ItemStack)b.getMetadata("ChangeBackItem").get(0).value();
-			            if (itemStack.getType().isBlock() || itemStack.getType() == Material.SKULL_ITEM || itemStack.getType() == Material.SAPLING) {
-			            	SlimefunItem sfItem = SlimefunItem.getByItem(itemStack);
-							if (sfItem != null && !(sfItem instanceof NotPlaceable)){
-								if(!BlockStorage.hasBlockInfo(b)) {
-									BlockStorage.addBlockInfo(b, "id", sfItem.getID(), true);
-									if (SlimefunItem.blockhandler.containsKey(sfItem.getID())) {
-										SlimefunItem.blockhandler.get(sfItem.getID()).onPlace(e.getPlayer(), b, sfItem);
-									}
-									System.out.println("Slimefun Fix > " + sfItem.getID() + " block fixed for player " + e.getPlayer().getName());
-									return;
-								}
-							}
-			            }
-			        }
-				}
-				if(b.getType() == Material.SKULL) {
-					Skull skull = (Skull) b.getState();
-					if(skull.hasOwner() && skull.getOwner().equalsIgnoreCase("cscorelib")) {
-						String texture = "";
-						try {
-							texture = CustomSkull.getTexture(b);
-						} catch (Exception e1) {
-							e1.printStackTrace();
-						}
-						boolean hasInfo = BlockStorage.hasBlockInfo(b);
-						if(!hasInfo && SlimefunItem.map_texture.containsKey(texture)) {
-							SlimefunItem sfItem = SlimefunItem.getByID(SlimefunItem.map_texture.get(texture));
-							if (sfItem != null && !(sfItem instanceof NotPlaceable)){
-								BlockStorage.addBlockInfo(b, "id", sfItem.getID(), true);
-								if (SlimefunItem.blockhandler.containsKey(sfItem.getID())) {
-									SlimefunItem.blockhandler.get(sfItem.getID()).onPlace(e.getPlayer(), b, sfItem);
-								}
-								System.out.println("Slimefun Fix > " + sfItem.getID() + " block fixed for player " + e.getPlayer().getName());	
-							}
-						} else if (hasInfo && (texture.isEmpty())) {
-							String sfItem = BlockStorage.checkID(b.getLocation());
-							if(sfItem != null) {
-								for(String textures:SlimefunItem.map_texture.keySet()) {
-									if(SlimefunItem.map_texture.get(textures).equalsIgnoreCase(sfItem)) {
-										System.out.println("Slimefun Fix > " + sfItem + " WITH STEVE SKIN FIXED AT " + b.getLocation());
-										try {
-											CustomSkull.setSkull(b, textures);
-										} catch (Exception e1) {
-											e1.printStackTrace();
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
 	
 	@EventHandler (ignoreCancelled = true)
     public void onPreBrew(InventoryClickEvent e) {
