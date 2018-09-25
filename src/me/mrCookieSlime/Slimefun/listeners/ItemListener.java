@@ -66,6 +66,7 @@ import me.mrCookieSlime.Slimefun.api.energy.ItemEnergy;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
 import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
 import me.mrCookieSlime.Slimefun.api.inventory.UniversalBlockMenu;
+import me.mrCookieSlime.Slimefun.api.network.Network;
 
 public class ItemListener implements Listener {
 
@@ -442,6 +443,9 @@ public class ItemListener implements Listener {
 									if (SlimefunItem.blockhandler.containsKey(sfItem.getID())) {
 										SlimefunItem.blockhandler.get(sfItem.getID()).onPlace(e.getPlayer(), b, sfItem);
 									}
+									if(sfItem.getID().contains("CARGO")) {
+										Network.handleAllNetworkLocationUpdate(b.getLocation());
+									}
 									System.out.println("Slimefun Fix > " + sfItem.getID() + " block fixed for player " + e.getPlayer().getName());
 									return;
 								}
@@ -465,6 +469,9 @@ public class ItemListener implements Listener {
 								BlockStorage.addBlockInfo(b, "id", sfItem.getID(), true);
 								if (SlimefunItem.blockhandler.containsKey(sfItem.getID())) {
 									SlimefunItem.blockhandler.get(sfItem.getID()).onPlace(e.getPlayer(), b, sfItem);
+								}
+								if(sfItem.getID().contains("CARGO")) {
+									Network.handleAllNetworkLocationUpdate(b.getLocation());
 								}
 								System.out.println("Slimefun Fix > " + sfItem.getID() + " block fixed for player " + e.getPlayer().getName());	
 							}

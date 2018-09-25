@@ -3,12 +3,14 @@ package me.mrCookieSlime.Slimefun.Commands;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -145,6 +147,30 @@ public class SlimefunCommand implements CommandExecutor, Listener {
 					else Messages.local.sendTranslation(sender, "messages.no-permission", true);
 				}
 				else Messages.local.sendTranslation(sender, "messages.only-players", true);
+			} else if (args[0].equalsIgnoreCase("setdata")) {
+				if (sender instanceof Player) {
+					if (sender.hasPermission("slimefun.data"))
+					{
+						if(args.length > 2) {
+							Block block = ((Player)sender).getTargetBlock((Set<Material>) null, 7);
+							BlockStorage.addBlockInfo(block, args[1], args[2]);
+						}
+						else
+							((Player)sender).sendMessage(ChatColor.translateAlternateColorCodes('&', "&c/sf setdata <data key> <data value>"));
+					}
+				}
+			} else if (args[0].equalsIgnoreCase("removedata")) {
+				if (sender instanceof Player) {
+					if (sender.hasPermission("slimefun.data"))
+					{
+						if(args.length > 1) {
+							Block block = ((Player)sender).getTargetBlock((Set<Material>) null, 7);
+							BlockStorage.addBlockInfo(block, args[1], null);
+						}
+						else
+							((Player)sender).sendMessage(ChatColor.translateAlternateColorCodes('&', "&c/sf removedata <data key>"));
+					}
+				}
 			}
 			else if (args[0].equalsIgnoreCase("cheat")) {
 				if (sender instanceof Player) {
