@@ -1,9 +1,49 @@
 package me.mrCookieSlime.Slimefun;
 
-import java.io.File;
-
+import me.mrCookieSlime.CSCoreLibPlugin.CSCoreLib;
+import me.mrCookieSlime.CSCoreLibPlugin.Configuration.Config;
+import me.mrCookieSlime.CSCoreLibPlugin.PluginUtils;
+import me.mrCookieSlime.CSCoreLibPlugin.general.Reflection.ReflectionUtils;
+import me.mrCookieSlime.Slimefun.AncientAltar.Pedestals;
+import me.mrCookieSlime.Slimefun.CSCoreLibSetup.CSCoreLibLoader;
+import me.mrCookieSlime.Slimefun.Commands.SlimefunCommand;
+import me.mrCookieSlime.Slimefun.Commands.SlimefunTabCompleter;
+import me.mrCookieSlime.Slimefun.GEO.OreGenSystem;
+import me.mrCookieSlime.Slimefun.GEO.Resources.NetherIceResource;
+import me.mrCookieSlime.Slimefun.GEO.Resources.OilResource;
+import me.mrCookieSlime.Slimefun.GPS.Elevator;
+import me.mrCookieSlime.Slimefun.GitHub.GitHubConnector;
+import me.mrCookieSlime.Slimefun.GitHub.GitHubSetup;
+import me.mrCookieSlime.Slimefun.Hashing.ItemHash;
+import me.mrCookieSlime.Slimefun.Lists.SlimefunItems;
+import me.mrCookieSlime.Slimefun.Misc.BookDesign;
+import me.mrCookieSlime.Slimefun.MySQL.Components.CallbackResults;
+import me.mrCookieSlime.Slimefun.MySQL.Components.ResultData;
+import me.mrCookieSlime.Slimefun.MySQL.MySQLMain;
+import me.mrCookieSlime.Slimefun.Objects.MultiBlock;
+import me.mrCookieSlime.Slimefun.Objects.Research;
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.SlimefunArmorPiece;
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.SlimefunItem;
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.AContainer;
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.machines.AutoEnchanter;
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.machines.ElectricDustWasher;
+import me.mrCookieSlime.Slimefun.Setup.*;
+import me.mrCookieSlime.Slimefun.URID.AutoSavingTask;
+import me.mrCookieSlime.Slimefun.URID.URID;
+import me.mrCookieSlime.Slimefun.WorldEdit.WESlimefunManager;
+import me.mrCookieSlime.Slimefun.api.BlockStorage;
+import me.mrCookieSlime.Slimefun.api.Slimefun;
+import me.mrCookieSlime.Slimefun.api.SlimefunBackup;
+import me.mrCookieSlime.Slimefun.api.TickerTask;
+import me.mrCookieSlime.Slimefun.api.energy.ChargableBlock;
+import me.mrCookieSlime.Slimefun.api.energy.EnergyNet;
+import me.mrCookieSlime.Slimefun.api.energy.ItemEnergy;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
+import me.mrCookieSlime.Slimefun.api.item_transport.CargoNet;
+import me.mrCookieSlime.Slimefun.api.item_transport.ChestManipulator;
 import me.mrCookieSlime.Slimefun.listeners.*;
-
+import net.coreprotect.CoreProtect;
+import net.coreprotect.CoreProtectAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -19,51 +59,9 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import me.mrCookieSlime.CSCoreLibPlugin.CSCoreLib;
-import me.mrCookieSlime.CSCoreLibPlugin.PluginUtils;
-import me.mrCookieSlime.CSCoreLibPlugin.Configuration.Config;
-import me.mrCookieSlime.CSCoreLibPlugin.general.Reflection.ReflectionUtils;
-import me.mrCookieSlime.Slimefun.AncientAltar.Pedestals;
-import me.mrCookieSlime.Slimefun.CSCoreLibSetup.CSCoreLibLoader;
-import me.mrCookieSlime.Slimefun.Commands.SlimefunCommand;
-import me.mrCookieSlime.Slimefun.Commands.SlimefunTabCompleter;
-import me.mrCookieSlime.Slimefun.GEO.OreGenSystem;
-import me.mrCookieSlime.Slimefun.GEO.Resources.NetherIceResource;
-import me.mrCookieSlime.Slimefun.GEO.Resources.OilResource;
-import me.mrCookieSlime.Slimefun.GPS.Elevator;
-import me.mrCookieSlime.Slimefun.GitHub.GitHubConnector;
-import me.mrCookieSlime.Slimefun.GitHub.GitHubSetup;
-import me.mrCookieSlime.Slimefun.Hashing.ItemHash;
-import me.mrCookieSlime.Slimefun.Lists.SlimefunItems;
-import me.mrCookieSlime.Slimefun.Misc.BookDesign;
-import me.mrCookieSlime.Slimefun.Objects.MultiBlock;
-import me.mrCookieSlime.Slimefun.Objects.Research;
-import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.SlimefunArmorPiece;
-import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.SlimefunItem;
-import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.AContainer;
-import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.machines.AutoEnchanter;
-import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.machines.ElectricDustWasher;
-import me.mrCookieSlime.Slimefun.Setup.Files;
-import me.mrCookieSlime.Slimefun.Setup.Messages;
-import me.mrCookieSlime.Slimefun.Setup.MiscSetup;
-import me.mrCookieSlime.Slimefun.Setup.ResearchSetup;
-import me.mrCookieSlime.Slimefun.Setup.SlimefunManager;
-import me.mrCookieSlime.Slimefun.Setup.SlimefunSetup;
-import me.mrCookieSlime.Slimefun.URID.AutoSavingTask;
-import me.mrCookieSlime.Slimefun.URID.URID;
-import me.mrCookieSlime.Slimefun.WorldEdit.WESlimefunManager;
-import me.mrCookieSlime.Slimefun.api.BlockStorage;
-import me.mrCookieSlime.Slimefun.api.Slimefun;
-import me.mrCookieSlime.Slimefun.api.SlimefunBackup;
-import me.mrCookieSlime.Slimefun.api.TickerTask;
-import me.mrCookieSlime.Slimefun.api.energy.ChargableBlock;
-import me.mrCookieSlime.Slimefun.api.energy.EnergyNet;
-import me.mrCookieSlime.Slimefun.api.energy.ItemEnergy;
-import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
-import me.mrCookieSlime.Slimefun.api.item_transport.CargoNet;
-import me.mrCookieSlime.Slimefun.api.item_transport.ChestManipulator;
-import net.coreprotect.CoreProtect;
-import net.coreprotect.CoreProtectAPI;
+import java.io.File;
+import java.util.HashMap;
+import java.util.List;
 
 public class SlimefunStartup extends JavaPlugin {
 
@@ -80,6 +78,7 @@ public class SlimefunStartup extends JavaPlugin {
 	private SoundMufflerListener soundMufflerListener;
 
 	public static TickerTask ticker;
+	public MySQLMain mySQLMain;
 
 	private CoreProtectAPI coreProtectAPI;
 
@@ -134,6 +133,17 @@ public class SlimefunStartup extends JavaPlugin {
 			}
 
 			instance = this;
+			mySQLMain = new MySQLMain();
+ 			for (World world: Bukkit.getWorlds()) {
+				mySQLMain.getBlock_storage().search("world", world.getName(), new CallbackResults() {
+					@Override
+					public void onResult(List<HashMap<String, ResultData>> results) {
+						mySQLMain.setLoad_storage(world.getName(), results);
+						mySQLMain.setLoaded(world.getName(), true);
+						System.out.println("[Slimefun] MySQL, world: " + world.getName() + " data received for " + results.size() + " blocks.");
+					}
+				});
+			}
 			System.out.println("[Slimefun] Loading Files...");
 			Files.cleanup();
 
@@ -417,8 +427,7 @@ public class SlimefunStartup extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		Bukkit.getScheduler().cancelTasks(this);
-		
+
 		// Finishes all started movements/removals of block data
 		ticker.HALTED = true;
 		ticker.run();
@@ -437,6 +446,12 @@ public class SlimefunStartup extends JavaPlugin {
 			SlimefunBackup.start();
 		} catch (Exception x) {}
 
+		if (mySQLMain.isEnabled())
+		{
+			//we can't just end all the thread, because its data being save to MySQL. We need to wait on them, and try and fource them to finish.
+			mySQLMain.disable();
+		}
+ 		Bukkit.getScheduler().cancelTasks(this);
 		// Prevent Memory Leaks
 		config = null;
 		researches = null;
